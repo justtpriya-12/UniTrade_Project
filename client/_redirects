@@ -1,4 +1,5 @@
-/*   /loginpage/index.html   200
+/  /loginpage/index.html   200
+/*  /loginpage/index.html   200
 /loginpage/*   /loginpage/:splat   200
 /home/*   /home/:splat   200
 /dashboard/*   /dashboard/:splat   200
