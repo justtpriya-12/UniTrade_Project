@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniTrade — Browse</title>
+  <link rel="stylesheet" href="./style.css"/>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logo">UT</div>
+        <span class="nav-name">UniTrade</span>
+      </div>
+
+      <div class="nav-search-wrap">
+        <svg class="search-ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+        <input type="text" id="searchInput" placeholder="Search textbooks, electronics, furniture…" class="search-input"/>
+        <button class="search-clear" id="searchClear">✕</button>
+      </div>
+
+      <div class="nav-actions">
+        <a href="../sell/index.html" class="btn-sell">+ Sell</a>
+        <div class="nav-user" id="navUser">
+          <div class="nav-av" id="navAv">U</div>
+          <span class="nav-uname" id="navUname">User</span>
+          <div class="nav-menu" id="navMenu">
+            <a href="../dashboard/index.html" class="nmenu-item">📊 My Dashboard</a>
+            <a href="../sell/index.html"       class="nmenu-item">📦 Sell an Item</a>
+            <div class="nmenu-divider"></div>
+            <button class="nmenu-item logout-btn" id="logoutBtn">⏻ Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ HERO STRIP ══ -->
+  <section class="hero-strip">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge">🎓 Campus Marketplace</div>
+        <h1 class="hero-title">Buy &amp; sell within<br><span>your campus</span></h1>
+        <p class="hero-sub">100% verified students · Safe transactions · Free to list</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-val" id="statListings">148</span><span class="hstat-lbl">Active Listings</span></div>
+        <div class="hstat-divider"></div>
+        <div class="hstat"><span class="hstat-val" id="statStudents">312</span><span class="hstat-lbl">Students</span></div>
+        <div class="hstat-divider"></div>
+        <div class="hstat"><span class="hstat-val" id="statCategories">6</span><span class="hstat-lbl">Categories</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main-layout">
+
+    <!-- ── Sidebar filters ── -->
+    <aside class="filters-sidebar" id="filterSidebar">
+      <div class="filter-header">
+        <span>Filters</span>
+        <button class="filter-reset" id="filterReset">Reset all</button>
+      </div>
+
+      <div class="filter-group">
+        <div class="fg-title">Category</div>
+        <div class="cat-chips" id="catChips">
+          <button class="cat-chip active" data-cat="all">All</button>
+          <button class="cat-chip" data-cat="books">📗 Books</button>
+          <button class="cat-chip" data-cat="electronics">💻 Electronics</button>
+          <button class="cat-chip" data-cat="furniture">🛋️ Furniture</button>
+          <button class="cat-chip" data-cat="accessories">🎒 Accessories</button>
+          <button class="cat-chip" data-cat="stationery">✏️ Stationery</button>
+          <button class="cat-chip" data-cat="clothing">👕 Clothing</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="fg-title">Price Range</div>
+        <div class="price-row">
+          <input type="number" id="priceMin" placeholder="₹ Min" class="price-inp"/>
+          <span class="price-sep">—</span>
+          <input type="number" id="priceMax" placeholder="₹ Max" class="price-inp"/>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="fg-title">Sort By</div>
+        <select class="sort-sel" id="sortBy">
+          <option value="newest">Newest first</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="popular">Most Popular</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="fg-title">Condition</div>
+        <div class="cond-list" id="condList">
+          <label class="cond-item"><input type="checkbox" value="new" checked/> Like New</label>
+          <label class="cond-item"><input type="checkbox" value="good" checked/> Good</label>
+          <label class="cond-item"><input type="checkbox" value="fair" checked/> Fair</label>
+        </div>
+      </div>
+
+      <button class="btn-apply" id="applyFilters">Apply Filters</button>
+    </aside>
+
+    <!-- ── Products area ── -->
+    <div class="products-area">
+
+      <div class="products-toolbar">
+        <div class="toolbar-left">
+          <span class="result-count" id="resultCount">Showing 12 listings</span>
+          <button class="filter-toggle-btn" id="filterToggle">⚙ Filters</button>
+        </div>
+        <div class="view-toggle">
+          <button class="vt-btn active" data-view="grid" id="gridBtn">⊞</button>
+          <button class="vt-btn" data-view="list" id="listBtn">☰</button>
+        </div>
+      </div>
+
+      <!-- Product grid -->
+      <div class="product-grid" id="productGrid">
+        <!-- Injected by script.js -->
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No listings found</div>
+        <div class="empty-sub">Try adjusting your filters or search term</div>
+        <button class="btn-reset-all" id="resetAll">Clear all filters</button>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        <button class="pg-btn" id="pgPrev" disabled>← Prev</button>
+        <div class="pg-pages" id="pgPages"></div>
+        <button class="pg-btn" id="pgNext">Next →</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══ PRODUCT DETAIL MODAL ══ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card" id="modalCard">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-body" id="modalBody">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOAST ══ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Page fade -->
+  <div class="page-fade" id="pageFade"></div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

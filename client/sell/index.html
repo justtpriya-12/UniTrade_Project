@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniTrade — Sell an Item</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-brand" href="../home/index.html">
+        <div class="nav-logo">UT</div>
+        <span class="nav-name">UniTrade</span>
+      </a>
+      <div class="nav-steps">
+        <div class="step active" data-s="1"><span>1</span> Details</div>
+        <div class="step-line"></div>
+        <div class="step" data-s="2"><span>2</span> Photos</div>
+        <div class="step-line"></div>
+        <div class="step" data-s="3"><span>3</span> Preview</div>
+      </div>
+      <div class="nav-right">
+        <div class="nav-av" id="navAv">U</div>
+        <a href="../home/index.html" class="nav-back">← Browse</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE ══ -->
+  <div class="page-wrap">
+
+    <!-- ── STEP 1: Product Details ── -->
+    <section class="step-section active" id="step1">
+      <div class="section-head">
+        <div class="sh-num">1</div>
+        <div>
+          <h2 class="sh-title">Product Details</h2>
+          <p class="sh-sub">Tell buyers what you're selling</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- Left column -->
+        <div class="form-col">
+
+          <div class="field">
+            <label>Product Title <span class="req">*</span></label>
+            <input type="text" id="fTitle" placeholder="e.g. Discrete Mathematics 3rd Edition" maxlength="80"/>
+            <div class="char-count"><span id="titleCount">0</span>/80</div>
+          </div>
+
+          <div class="field">
+            <label>Category <span class="req">*</span></label>
+            <div class="cat-grid" id="catGrid">
+              <button type="button" class="cat-btn" data-cat="books">📗 Books</button>
+              <button type="button" class="cat-btn" data-cat="electronics">💻 Electronics</button>
+              <button type="button" class="cat-btn" data-cat="furniture">🛋️ Furniture</button>
+              <button type="button" class="cat-btn" data-cat="accessories">🎒 Accessories</button>
+              <button type="button" class="cat-btn" data-cat="stationery">✏️ Stationery</button>
+              <button type="button" class="cat-btn" data-cat="clothing">👕 Clothing</button>
+            </div>
+            <input type="hidden" id="fCategory"/>
+          </div>
+
+          <div class="field">
+            <label>Description <span class="req">*</span></label>
+            <textarea id="fDesc" rows="5" placeholder="Describe condition, usage history, any damage, what's included in the box, etc." maxlength="500"></textarea>
+            <div class="char-count"><span id="descCount">0</span>/500</div>
+          </div>
+
+        </div>
+
+        <!-- Right column -->
+        <div class="form-col">
+
+          <div class="field-row2">
+            <div class="field">
+              <label>Price (₹) <span class="req">*</span></label>
+              <div class="inp-wrap">
+                <span class="inp-prefix">₹</span>
+                <input type="number" id="fPrice" placeholder="0" min="1" max="999999"/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Original Price (₹)</label>
+              <div class="inp-wrap">
+                <span class="inp-prefix">₹</span>
+                <input type="number" id="fOrigPrice" placeholder="0" min="1"/>
+              </div>
+              <div class="field-hint" id="discountHint"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Condition <span class="req">*</span></label>
+            <div class="cond-grid" id="condGrid">
+              <button type="button" class="cond-btn" data-cond="new">
+                <span class="cond-icon">✨</span>
+                <span class="cond-label">Like New</span>
+                <span class="cond-sub">Never or barely used</span>
+              </button>
+              <button type="button" class="cond-btn" data-cond="good">
+                <span class="cond-icon">👍</span>
+                <span class="cond-label">Good</span>
+                <span class="cond-sub">Minor signs of use</span>
+              </button>
+              <button type="button" class="cond-btn" data-cond="fair">
+                <span class="cond-icon">🔄</span>
+                <span class="cond-label">Fair</span>
+                <span class="cond-sub">Visible wear, works fine</span>
+              </button>
+            </div>
+            <input type="hidden" id="fCondition"/>
+          </div>
+
+          <div class="field">
+            <label>Pickup Location</label>
+            <div class="inp-wrap">
+              <svg class="inp-ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+              <input type="text" id="fLocation" placeholder="e.g. Hostel Block C, Room 214" style="padding-left:38px"/>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Contact Preference</label>
+            <div class="contact-opts" id="contactOpts">
+              <button type="button" class="copt-btn active" data-c="chat">💬 In-App Chat</button>
+              <button type="button" class="copt-btn" data-c="phone">📞 Phone Call</button>
+              <button type="button" class="copt-btn" data-c="whatsapp">📱 WhatsApp</button>
+            </div>
+            <input type="hidden" id="fContact" value="chat"/>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <div></div>
+        <button class="btn-next" id="step1Next">Next: Add Photos →</button>
+      </div>
+    </section>
+
+    <!-- ── STEP 2: Photos ── -->
+    <section class="step-section" id="step2">
+      <div class="section-head">
+        <div class="sh-num">2</div>
+        <div>
+          <h2 class="sh-title">Product Photos</h2>
+          <p class="sh-sub">Upload up to 5 photos — good photos get more buyers</p>
+        </div>
+      </div>
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-inner" id="dropInner">
+          <div class="drop-icon">📸</div>
+          <div class="drop-title">Drag &amp; drop photos here</div>
+          <div class="drop-sub">or click to browse · JPG, PNG, WEBP · Max 5MB each · Up to 5 photos</div>
+          <button type="button" class="btn-browse" id="browseBtn">Browse Photos</button>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
+      </div>
+
+      <!-- Preview grid -->
+      <div class="photo-preview-grid" id="photoGrid">
+        <!-- filled by JS -->
+      </div>
+
+      <!-- Tips -->
+      <div class="photo-tips">
+        <div class="tip-title">📷 Photo tips for more buyers</div>
+        <div class="tips-row">
+          <div class="tip-item"><span>💡</span> Good natural lighting</div>
+          <div class="tip-item"><span>📐</span> Show all angles</div>
+          <div class="tip-item"><span>🔍</span> Capture any defects</div>
+          <div class="tip-item"><span>📦</span> Include box/accessories</div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button class="btn-back" id="step2Back">← Back</button>
+        <button class="btn-next" id="step2Next">Next: Preview →</button>
+      </div>
+    </section>
+
+    <!-- ── STEP 3: Preview & Submit ── -->
+    <section class="step-section" id="step3">
+      <div class="section-head">
+        <div class="sh-num">3</div>
+        <div>
+          <h2 class="sh-title">Preview &amp; Publish</h2>
+          <p class="sh-sub">This is how your listing will look to buyers</p>
+        </div>
+      </div>
+
+      <!-- Preview card -->
+      <div class="preview-wrap">
+        <div class="preview-card" id="previewCard">
+          <!-- filled by JS -->
+        </div>
+
+        <!-- Listing summary table -->
+        <div class="summary-panel">
+          <div class="summary-title">Listing Summary</div>
+          <div class="summary-rows" id="summaryRows">
+            <!-- filled by JS -->
+          </div>
+
+          <div class="publish-box">
+            <div class="publish-note">
+              <span>🛡️</span>
+              <span>Your listing will be visible to all verified students on campus. You can edit or delete it anytime from your dashboard.</span>
+            </div>
+            <button class="btn-publish" id="publishBtn">🚀 Publish Listing</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button class="btn-back" id="step3Back">← Back</button>
+        <div></div>
+      </div>
+    </section>
+
+    <!-- ── SUCCESS ── -->
+    <section class="step-section" id="stepSuccess">
+      <div class="success-wrap">
+        <div class="success-icon">🎉</div>
+        <h2 class="success-title">Listing Published!</h2>
+        <p class="success-sub">Your item is now live on the campus marketplace. Buyers can see it and contact you directly.</p>
+        <div class="success-actions">
+          <a href="../home/index.html" class="btn-go-browse">Browse Marketplace</a>
+          <a href="../dashboard/index.html" class="btn-go-dash">View My Listings</a>
+        </div>
+        <div class="success-tip">
+          💡 Tip: Keep your app open — buyers may contact you soon!
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /page-wrap -->
+
+  <!-- Error toast -->
+  <div class="toast" id="toast"></div>
+
+  <div class="page-fade" id="pageFade"></div>
+  <script src="script.js"></script>
+</body>
+</html>
