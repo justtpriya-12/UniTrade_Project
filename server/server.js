@@ -10,7 +10,10 @@ const app = express();
  
 // ── MIDDLEWARE ────────────────────────────────────────────────
 app.use(cors({
-  origin: '*',           // allow any origin during development
+  origin: [
+    'http://localhost:5500',
+    'https://unitrade-project.netlify.app'
+  ],
   methods: ['GET','POST','PUT','DELETE'],
   allowedHeaders: ['Content-Type','Authorization']
 }));
