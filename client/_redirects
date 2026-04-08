@@ -1,1 +1,6 @@
-/  /loginpage/index.html   200
+/loginpage/*  /loginpage/:splat  200
+/home/*       /home/:splat       200
+/dashboard/*  /dashboard/:splat  200
+/product/*    /product/:splat    200
+/sell/*       /sell/:splat       200
+/admin/*      /admin/:splat      200
