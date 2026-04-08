@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════
 
 // ── Change this if your server runs on different port ──
-const API = 'http://localhost:5000';
+const API = 'https://unitrade-project.onrender.com';
 
 /* ─────────────────────────────────────
    CAMPUS CANVAS ANIMATION
