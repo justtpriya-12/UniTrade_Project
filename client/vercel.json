@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "src": "/home/(.*)", "dest": "/home/index.html" },
+    { "src": "/loginpage/(.*)", "dest": "/loginpage/index.html" },
+    { "src": "/product/(.*)", "dest": "/product/index.html" },
+    { "src": "/sell/(.*)", "dest": "/sell/index.html" }
+  ]
+}
