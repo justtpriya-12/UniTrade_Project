@@ -11,22 +11,24 @@ const app = express();
 // ── MIDDLEWARE ────────────────────────────────────────────────
 app.use(cors({
   origin: [
-    'http://localhost:5500',              // VS Code Live Server
-    'http://localhost:3000',              // local dev
+    'http://localhost:5500',
+    'http://localhost:3000',
     'http://127.0.0.1:5500',
-    /\.netlify\.app$/,                  // any netlify subdomain
-    'https://unitrade-project.netlify.app' // your specific netlify URL
+    /\.netlify\.app$/,
+    'https://unitrade-project.netlify.app',
+
+    // ✅ IMPORTANT: Your frontend on Render
+    'https://unitrade-project-1.onrender.com'
   ],
   methods: ['GET','POST','PUT','DELETE'],
   allowedHeaders: ['Content-Type','Authorization'],
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ── SERVE UPLOADED IMAGES ─────────────────────────────────────
-// Images saved in public/uploads/ will be accessible at:
-// http://localhost:5000/uploads/filename.jpg
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // ── ROUTES ────────────────────────────────────────────────────
