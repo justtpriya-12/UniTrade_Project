@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniTrade — Product Detail</title>
+  <link rel="stylesheet" href="./style.css"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-brand" href="../home/index.html">
+        <div class="nav-logo">UT</div>
+        <span class="nav-name">UniTrade</span>
+      </a>
+
+      <div class="breadcrumb">
+        <a href="../home/index.html">Browse</a>
+        <span>›</span>
+        <span id="bcCategory">Category</span>
+        <span>›</span>
+        <span id="bcTitle" class="bc-current">Product</span>
+      </div>
+
+      <div class="nav-right">
+        <a href="../sell/index.html" class="btn-sell-sm">+ Sell</a>
+        <div class="nav-user" id="navUser">
+          <div class="nav-av" id="navAv">U</div>
+          <span class="nav-uname" id="navUname">User</span>
+          <div class="nav-menu" id="navMenu">
+            <a href="../dashboard/index.html" class="nmenu-item">📊 My Dashboard</a>
+            <a href="../sell/index.html"       class="nmenu-item">📦 Sell an Item</a>
+            <div class="nmenu-divider"></div>
+            <button class="nmenu-item logout-btn" id="logoutBtn">⏻ Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <div class="page-wrap">
+
+    <!-- Back -->
+    <button class="back-btn" onclick="history.back()">← Back to listings</button>
+
+    <!-- Skeleton / content -->
+    <div class="product-layout" id="productLayout">
+
+      <!-- LEFT: Image gallery -->
+      <div class="gallery-col">
+        <div class="main-img-wrap" id="mainImgWrap">
+          <div class="main-img" id="mainImg">
+            <!-- filled by JS -->
+          </div>
+          <button class="img-nav prev" id="imgPrev">‹</button>
+          <button class="img-nav next" id="imgNext">›</button>
+          <div class="img-counter" id="imgCounter">1 / 1</div>
+        </div>
+        <div class="thumb-strip" id="thumbStrip">
+          <!-- filled by JS -->
+        </div>
+
+        <!-- Safety tips card -->
+        <div class="safety-card">
+          <div class="safety-title">🛡️ Safety Tips</div>
+          <ul class="safety-list">
+            <li>Meet in a public campus location</li>
+            <li>Inspect the item before paying</li>
+            <li>Never pay in advance online</li>
+            <li>Bring a friend if unsure</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RIGHT: Product info -->
+      <div class="info-col">
+
+        <!-- Category + badges -->
+        <div class="info-top-row">
+          <span class="info-cat" id="infoCat">Category</span>
+          <div class="top-badges">
+            <span class="cond-badge" id="condBadge">Condition</span>
+            <span class="fresh-badge" id="freshBadge">Just listed</span>
+          </div>
+        </div>
+
+        <h1 class="info-title" id="infoTitle">Loading…</h1>
+
+        <!-- Price row -->
+        <div class="price-row">
+          <div class="price-main" id="priceMain">₹0</div>
+          <div class="price-orig" id="priceOrig"></div>
+          <div class="discount-badge" id="discountBadge"></div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="quick-stats" id="quickStats">
+          <div class="qstat"><span class="qstat-ico">👁️</span><span id="statViews">0 views</span></div>
+          <div class="qstat"><span class="qstat-ico">❤️</span><span id="statWish">0 wishlists</span></div>
+          <div class="qstat"><span class="qstat-ico">📅</span><span id="statPosted">Posted</span></div>
+          <div class="qstat"><span class="qstat-ico">📍</span><span id="statLocation">Campus</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Description -->
+        <div class="section-label">Description</div>
+        <div class="desc-text" id="descText">Loading…</div>
+
+        <!-- Tags -->
+        <div class="tags-row" id="tagsRow"></div>
+
+        <div class="divider"></div>
+
+        <!-- Seller card -->
+        <div class="section-label">Seller</div>
+        <div class="seller-card" id="sellerCard">
+          <div class="seller-av" id="sellerAv">S</div>
+          <div class="seller-info">
+            <div class="seller-name" id="sellerName">Seller</div>
+            <div class="seller-meta" id="sellerMeta">Verified student</div>
+            <div class="seller-rating" id="sellerRating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-val">4.8</span>
+              <span class="rating-count">(12 reviews)</span>
+            </div>
+          </div>
+          <button class="btn-view-profile" id="viewProfileBtn">View Profile</button>
+        </div>
+
+        <!-- Owner actions (shown only to the listing owner) -->
+        <div class="owner-actions" id="ownerActions" style="display:none">
+          <button class="btn-edit" id="editBtn">✏️ Edit Listing</button>
+          <button class="btn-delete" id="deleteBtn">🗑️ Delete</button>
+          <button class="btn-mark-sold" id="markSoldBtn">✅ Mark as Sold</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- CTA buttons (shown to buyers) -->
+        <div class="cta-actions" id="ctaActions">
+          <button class="btn-contact-seller" id="contactBtn">
+            💬 Contact Seller
+          </button>
+
+          <!-- ✅ ADDED PAY BUTTON -->
+          <button class="btn-pay" id="payBtn">
+            Pay ₹<span id="payAmount">0</span>
+          </button>
+
+
+          <button class="btn-wishlist" id="wishlistBtn">
+            🤍 Save
+          </button>
+        </div>
+
+        <!-- Contact modal inline -->
+        <div class="contact-panel" id="contactPanel" style="display:none">
+          <div class="contact-panel-head">
+            <span>Send a Message</span>
+            <button class="cp-close" id="cpClose">✕</button>
+          </div>
+          <div class="msg-history" id="msgHistory">
+            <div class="msg-hint">Start the conversation — ask about availability, condition, or negotiate the price!</div>
+          </div>
+          <div class="msg-quick-row">
+            <button class="msg-quick" data-msg="Is this still available?">Still available?</button>
+            <button class="msg-quick" data-msg="Can you do ₹ lower price?">Negotiate price?</button>
+            <button class="msg-quick" data-msg="Where can we meet on campus?">Meet location?</button>
+          </div>
+          <div class="msg-input-row">
+            <textarea id="msgInput" rows="2" placeholder="Type your message…" maxlength="300"></textarea>
+            <button class="btn-send" id="sendBtn">Send ↑</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ RELATED PRODUCTS ══ -->
+    <section class="related-section">
+      <h2 class="related-title">More in <span id="relatedCatLabel">this category</span></h2>
+      <div class="related-grid" id="relatedGrid">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+  </div><!-- /page-wrap -->
+
+  <!-- ── Delete confirm modal ── -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <div class="modal-icon">🗑️</div>
+      <div class="modal-title">Delete this listing?</div>
+      <div class="modal-sub">This action cannot be undone. Your listing will be permanently removed.</div>
+      <div class="modal-btns">
+        <button class="btn-cancel" id="deleteCancelBtn">Cancel</button>
+        <button class="btn-confirm-del" id="deleteConfirmBtn">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+  <div class="page-fade" id="pageFade"></div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniTrade — Admin Panel</title>
+  <link rel="stylesheet" href="./style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">UT</div>
+      <div>
+        <div class="sb-name">UniTrade</div>
+        <div class="sb-tag">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-section">MAIN</div>
+      <button class="sb-item active" data-tab="overview"><span>⊞</span>Overview</button>
+      <button class="sb-item" data-tab="listings"><span>📦</span>Listings<em class="sb-cnt" id="sbListingCnt">0</em></button>
+      <button class="sb-item" data-tab="users"><span>👥</span>Users<em class="sb-cnt" id="sbUserCnt">0</em></button>
+      <button class="sb-item" data-tab="reports"><span>🚨</span>Reports<em class="sb-cnt red" id="sbReportCnt">0</em></button>
+      <div class="sb-section">SYSTEM</div>
+      <button class="sb-item" data-tab="categories"><span>📂</span>Categories</button>
+      <button class="sb-item" data-tab="analytics"><span>📊</span>Analytics</button>
+      <button class="sb-item" data-tab="settings"><span>⚙️</span>Settings</button>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-admin-av" id="sbAdminAv">AD</div>
+      <div class="sb-admin-info">
+        <div class="sb-admin-name" id="sbAdminName">Admin</div>
+        <div class="sb-admin-role">Super Admin</div>
+      </div>
+      <button class="sb-logout" id="logoutBtn" title="Logout">⏻</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrap">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div>
+          <div class="topbar-title" id="topbarTitle">Overview</div>
+          <div class="topbar-sub"  id="topbarSub">Welcome back — campus marketplace status</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="date-chip" id="dateChip">📅 Today</div>
+        <a href="../home/index.html" class="btn-view-site">← View Site</a>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- ── OVERVIEW ── -->
+      <section class="tab-panel active" id="tab-overview">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico" style="background:#eef2ff">📦</div><span class="kpi-trend up">↑ 12%</span></div><div class="kpi-val" data-target="148">0</div><div class="kpi-lbl">Total Listings</div><div class="kpi-bar"><div class="kpi-fill" style="width:74%;background:#4f46e5"></div></div></div>
+          <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico" style="background:#f0fdf4">👥</div><span class="kpi-trend up">↑ 21%</span></div><div class="kpi-val" data-target="312">0</div><div class="kpi-lbl">Registered Students</div><div class="kpi-bar"><div class="kpi-fill" style="width:82%;background:#22c55e"></div></div></div>
+          <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico" style="background:#fff7ed">🛒</div><span class="kpi-trend up">↑ 8%</span></div><div class="kpi-val" data-target="63">0</div><div class="kpi-lbl">Transactions</div><div class="kpi-bar"><div class="kpi-fill" style="width:63%;background:#f97316"></div></div></div>
+          <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico" style="background:#fef2f2">🚨</div><span class="kpi-trend down">↑ 2</span></div><div class="kpi-val" data-target="5">0</div><div class="kpi-lbl">Pending Reports</div><div class="kpi-bar"><div class="kpi-fill" style="width:12%;background:#ef4444"></div></div></div>
+        </div>
+
+        <div class="ov-row">
+          <!-- Chart -->
+          <div class="ov-card chart-card">
+            <div class="ov-card-head"><span class="ov-card-title">Listings & Users Growth</span><span class="chip">Last 7 months</span></div>
+            <div class="legend-row">
+              <span><i style="background:#4f46e5"></i>Listings</span>
+              <span><i style="background:#22c55e"></i>Users</span>
+            </div>
+            <div class="chart-wrap"><canvas id="growthChart"></canvas></div>
+          </div>
+
+          <!-- Category breakdown -->
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Category Breakdown</span></div>
+            <div class="donut-wrap"><canvas id="donutChart"></canvas><div class="donut-c"><div class="dc-v">148</div><div class="dc-l">Items</div></div></div>
+            <div class="cat-bars" id="catBars"></div>
+          </div>
+        </div>
+
+        <div class="ov-row">
+          <!-- Recent activity -->
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Recent Activity</span><button class="chip-btn" data-tab="listings">View all →</button></div>
+            <div id="recentActivity"></div>
+          </div>
+          <!-- Pending reports -->
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Pending Reports</span><button class="chip-btn" data-tab="reports">View all →</button></div>
+            <div id="pendingReports"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── LISTINGS ── -->
+      <section class="tab-panel" id="tab-listings">
+        <div class="panel-toolbar">
+          <div class="toolbar-left">
+            <div class="search-wrap">
+              <svg class="s-ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+              <input type="text" id="listingSearch" placeholder="Search listings…" class="search-inp"/>
+            </div>
+            <div class="filter-pills">
+              <button class="fp-btn active" data-lf="all">All</button>
+              <button class="fp-btn" data-lf="active">Active</button>
+              <button class="fp-btn" data-lf="sold">Sold</button>
+              <button class="fp-btn" data-lf="pending">Pending</button>
+            </div>
+          </div>
+          <button class="btn-export" id="exportListings">⬇ Export CSV</button>
+        </div>
+        <div class="table-card">
+          <table class="admin-table" id="listingsTable">
+            <thead><tr><th><input type="checkbox" id="selectAllListings"/></th><th>Item</th><th>Seller</th><th>Category</th><th>Price</th><th>Views</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
+            <tbody id="listingsTbody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="listingsEmpty" style="display:none"><div class="es-ico">📦</div><div class="es-title">No listings found</div></div>
+      </section>
+
+      <!-- ── USERS ── -->
+      <section class="tab-panel" id="tab-users">
+        <div class="panel-toolbar">
+          <div class="toolbar-left">
+            <div class="search-wrap">
+              <svg class="s-ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+              <input type="text" id="userSearch" placeholder="Search users…" class="search-inp"/>
+            </div>
+            <div class="filter-pills">
+              <button class="fp-btn active" data-uf="all">All</button>
+              <button class="fp-btn" data-uf="active">Active</button>
+              <button class="fp-btn" data-uf="blocked">Blocked</button>
+            </div>
+          </div>
+          <button class="btn-export" id="exportUsers">⬇ Export CSV</button>
+        </div>
+        <div class="table-card">
+          <table class="admin-table">
+            <thead><tr><th><input type="checkbox" id="selectAllUsers"/></th><th>User</th><th>Email</th><th>Listings</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="usersTbody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="usersEmpty" style="display:none"><div class="es-ico">👥</div><div class="es-title">No users found</div></div>
+      </section>
+
+      <!-- ── REPORTS ── -->
+      <section class="tab-panel" id="tab-reports">
+        <div class="panel-toolbar">
+          <div class="toolbar-left">
+            <div class="filter-pills">
+              <button class="fp-btn active" data-rf="all">All</button>
+              <button class="fp-btn" data-rf="pending">Pending</button>
+              <button class="fp-btn" data-rf="resolved">Resolved</button>
+              <button class="fp-btn" data-rf="dismissed">Dismissed</button>
+            </div>
+          </div>
+        </div>
+        <div class="reports-list" id="reportsList"></div>
+        <div class="empty-state" id="reportsEmpty" style="display:none"><div class="es-ico">🚨</div><div class="es-title">No reports found</div></div>
+      </section>
+
+      <!-- ── CATEGORIES ── -->
+      <section class="tab-panel" id="tab-categories">
+        <div class="panel-toolbar">
+          <div class="toolbar-left"><span class="toolbar-label">Manage product categories</span></div>
+          <button class="btn-primary" id="addCatBtn">+ Add Category</button>
+        </div>
+        <div class="cat-grid" id="catGrid"></div>
+      </section>
+
+      <!-- ── ANALYTICS ── -->
+      <section class="tab-panel" id="tab-analytics">
+        <div class="analytics-grid">
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Daily Listings (Last 14 Days)</span></div>
+            <div class="chart-wrap" style="height:180px"><canvas id="dailyChart"></canvas></div>
+          </div>
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Category Distribution</span></div>
+            <div class="chart-wrap" style="height:180px"><canvas id="catChart"></canvas></div>
+          </div>
+          <div class="ov-card full-width">
+            <div class="ov-card-head"><span class="ov-card-title">Top Performing Listings</span></div>
+            <div class="top-list" id="topListings"></div>
+          </div>
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Platform Stats</span></div>
+            <div class="stat-list" id="statList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SETTINGS ── -->
+      <section class="tab-panel" id="tab-settings">
+        <div class="settings-cols">
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Platform Settings</span></div>
+            <div class="settings-form">
+              <div class="sf-field"><label>Platform Name</label><input type="text" value="UniTrade" id="sfPlatName"/></div>
+              <div class="sf-field"><label>Max Photos per Listing</label><input type="number" value="5" min="1" max="10" id="sfMaxPhotos"/></div>
+              <div class="sf-field"><label>Max Price (₹)</label><input type="number" value="50000" id="sfMaxPrice"/></div>
+              <div class="sf-field"><label>College Email Domain</label><input type="text" value=".ac.in, .edu" id="sfEmailDomain"/></div>
+              <div class="sf-toggle"><label>Require email verification</label><label class="tog"><input type="checkbox" checked/><span></span></label></div>
+              <div class="sf-toggle"><label>Allow guest browsing</label><label class="tog"><input type="checkbox"/><span></span></label></div>
+              <div class="sf-toggle"><label>Maintenance mode</label><label class="tog"><input type="checkbox" id="maintenanceMode"/><span></span></label></div>
+              <button class="btn-save-settings" id="saveSettingsBtn">Save Settings</button>
+            </div>
+          </div>
+          <div class="ov-card">
+            <div class="ov-card-head"><span class="ov-card-title">Admin Account</span></div>
+            <div class="settings-form">
+              <div class="sf-field"><label>Admin Name</label><input type="text" id="sfAdminName" value="Admin"/></div>
+              <div class="sf-field"><label>Admin Email</label><input type="email" id="sfAdminEmail" value="admin@college.ac.in"/></div>
+              <div class="sf-field"><label>New Password</label><input type="password" id="sfAdminPass" placeholder="Leave blank to keep current"/></div>
+              <button class="btn-save-settings" id="saveAdminBtn">Update Account</button>
+            </div>
+            <div class="ov-card-head" style="margin-top:1.25rem"><span class="ov-card-title">Danger Zone</span></div>
+            <div class="dz-row"><div><div class="dz-lbl">Clear All Reports</div><div class="dz-sub">Remove all resolved reports from the database</div></div><button class="btn-dz" id="clearReportsBtn">Clear</button></div>
+            <div class="dz-row" style="margin-top:8px"><div><div class="dz-lbl">Purge Sold Listings</div><div class="dz-sub">Delete all listings marked as sold</div></div><button class="btn-dz" id="purgeSoldBtn">Purge</button></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div><!-- /main-wrap -->
+
+  <!-- USER DETAIL MODAL -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-box wide" id="userModalBox"></div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <div class="modal-ico" id="confirmIco">⚠️</div>
+      <div class="modal-ttl" id="confirmTitle">Are you sure?</div>
+      <div class="modal-sub" id="confirmSub">This action cannot be undone.</div>
+      <div class="modal-btns"><button class="btn-cancel-m" id="confirmCancelBtn">Cancel</button><button class="btn-confirm" id="confirmOkBtn">Confirm</button></div>
+    </div>
+  </div>
+
+  <!-- ADD CATEGORY MODAL -->
+  <div class="modal-overlay" id="catModal">
+    <div class="modal-box">
+      <div class="modal-hdr"><span>Add Category</span><button class="modal-x" id="catModalClose">✕</button></div>
+      <div class="sf-field" style="margin-bottom:10px"><label>Category Name</label><input type="text" id="newCatName" placeholder="e.g. Sports"/></div>
+      <div class="sf-field" style="margin-bottom:10px"><label>Icon (emoji)</label><input type="text" id="newCatIcon" placeholder="e.g. ⚽" maxlength="4"/></div>
+      <div class="modal-btns"><button class="btn-cancel-m" id="catCancelBtn">Cancel</button><button class="btn-confirm" id="catSaveBtn">Add</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="page-fade" id="pageFade"></div>
+  <script src="./script.js"></script>
+</body>
+</html>

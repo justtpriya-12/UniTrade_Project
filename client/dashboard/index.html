@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniTrade — My Dashboard</title>
+  <link rel="stylesheet" href="./style.css"/>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-brand" href="../home/index.html">
+        <div class="nav-logo">UT</div>
+        <span class="nav-name">UniTrade</span>
+      </a>
+      <div class="nav-links">
+        <a href="../home/index.html" class="nav-link">Browse</a>
+        <a href="../sell/index.html" class="nav-link">Sell</a>
+        <a href="index.html"         class="nav-link active">Dashboard</a>
+      </div>
+      <div class="nav-right">
+
+        <!-- NOTIFICATION BELL -->
+        <div class="notif-bell" id="notifBell">
+          <button class="bell-btn" id="bellBtn" title="Notifications">
+            🔔
+            <span class="bell-badge" id="bellBadge" style="display:none">0</span>
+          </button>
+          <div class="bell-dropdown" id="bellDropdown">
+            <div class="bell-head">
+              <span class="bell-title">Notifications</span>
+              <button class="bell-mark-all" id="markAllReadBtn">Mark all read</button>
+            </div>
+            <div class="bell-list" id="bellList">
+              <div class="bell-empty">No notifications yet</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-user" id="navUser">
+          <div class="nav-av" id="navAv">U</div>
+          <span class="nav-uname" id="navUname">User</span>
+          <div class="nav-dropdown">
+            <div class="ndrop-profile">
+              <div class="ndrop-av" id="ndropAv">U</div>
+              <div>
+                <div class="ndrop-name"  id="ndropName">User</div>
+                <div class="ndrop-email" id="ndropEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1f6a6c7a6d5f7c7073737a787a317e7c317671">[email&#160;protected]</a></div>
+              </div>
+            </div>
+            <div class="ndrop-divider"></div>
+            <a href="index.html"         class="ndrop-item">📊 Dashboard</a>
+            <a href="../sell/index.html" class="ndrop-item">📦 Sell an Item</a>
+            <a href="../home/index.html" class="ndrop-item">🛍️ Browse</a>
+            <div class="ndrop-divider"></div>
+            <button class="ndrop-item logout-btn" id="logoutBtn">⏻ Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE -->
+  <div class="page-wrap">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-profile">
+        <div class="sb-av"    id="sbAv">U</div>
+        <div class="sb-name"  id="sbName">User</div>
+        <div class="sb-email" id="sbEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7a2a4b2a597b4b8bbbbb2b0b2f9b6b4f9beb9">[email&#160;protected]</a></div>
+        <div class="sb-badge">✓ Verified Student</div>
+      </div>
+      <nav class="sb-nav">
+        <button class="sb-item active" data-tab="overview"><span>⊞</span> Overview</button>
+        <button class="sb-item" data-tab="listings"><span>📦</span> My Listings <em class="sb-cnt" id="listingCnt">0</em></button>
+        <button class="sb-item" data-tab="wishlist"><span>❤️</span> Wishlist     <em class="sb-cnt" id="wishCnt">0</em></button>
+        <button class="sb-item" data-tab="messages"><span>💬</span> Messages     <em class="sb-cnt new" id="msgCnt">3</em></button>
+        <button class="sb-item" data-tab="requests"><span>📋</span> My Requests <em class="sb-cnt" id="requestCnt">0</em></button>
+        <button class="sb-item" data-tab="settings"><span>⚙️</span> Settings</button>
+      </nav>
+      <a href="../sell/index.html" class="sb-sell-btn">+ List a New Item</a>
+    </aside>
+
+    <!-- Content -->
+    <div class="content-area">
+
+      <!-- Mobile tabs -->
+      <div class="mobile-tabs">
+        <button class="mtab active" data-tab="overview">⊞</button>
+        <button class="mtab" data-tab="listings">📦</button>
+        <button class="mtab" data-tab="wishlist">❤️</button>
+        <button class="mtab" data-tab="messages">💬</button>
+        <button class="mtab" data-tab="requests">📋</button>
+        <button class="mtab" data-tab="settings">⚙️</button>
+      </div>
+
+      <!-- ── OVERVIEW ── -->
+      <section class="tab-panel active" id="tab-overview">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title" id="greetMsg">Good morning 👋</h2>
+            <p class="panel-sub">Your UniTrade activity at a glance</p>
+          </div>
+          <a href="../sell/index.html" class="btn-action">+ New Listing</a>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi"><div class="kpi-ico" style="background:#eef2ff">📦</div><div class="kpi-val" id="kActive">0</div><div class="kpi-lbl">Active</div></div>
+          <div class="kpi"><div class="kpi-ico" style="background:#f0fdf4">✅</div><div class="kpi-val" id="kSold">0</div><div class="kpi-lbl">Sold</div></div>
+          <div class="kpi"><div class="kpi-ico" style="background:#fff7ed">👁️</div><div class="kpi-val" id="kViews">0</div><div class="kpi-lbl">Views</div></div>
+          <div class="kpi"><div class="kpi-ico" style="background:#fef2f2">❤️</div><div class="kpi-val" id="kWish">0</div><div class="kpi-lbl">Saves</div></div>
+        </div>
+
+        <div class="ov-grid">
+          <div class="ov-card">
+            <div class="oc-head"><span class="oc-title">Recent Listings</span><button class="oc-link" data-tab="listings">View all →</button></div>
+            <div id="recentList"></div>
+          </div>
+          <div class="ov-card">
+            <div class="oc-head"><span class="oc-title">Quick Actions</span></div>
+            <div class="qa-stack">
+              <a href="../sell/index.html" class="qa-row"><div class="qa-ico" style="background:#eef2ff">📦</div><div><div class="qa-lbl">List an Item</div><div class="qa-sub">Upload and sell now</div></div></a>
+              <a href="../home/index.html" class="qa-row"><div class="qa-ico" style="background:#f0fdf4">🛍️</div><div><div class="qa-lbl">Browse Listings</div><div class="qa-sub">Find what you need</div></div></a>
+              <button class="qa-row" data-tab="messages"><div class="qa-ico" style="background:#fff7ed">💬</div><div><div class="qa-lbl">Check Messages</div><div class="qa-sub">Buyers may have reached out</div></div></button>
+              <button class="qa-row" data-tab="wishlist"><div class="qa-ico" style="background:#fef2f2">❤️</div><div><div class="qa-lbl">View Wishlist</div><div class="qa-sub">Items you've saved</div></div></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── LISTINGS ── -->
+      <section class="tab-panel" id="tab-listings">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">My Listings</h2>
+            <p class="panel-sub">All items you've put up for sale</p>
+          </div>
+          <a href="../sell/index.html" class="btn-action">+ New Listing</a>
+        </div>
+
+        <div class="filter-bar">
+          <button class="fb-btn active" data-filter="all">All</button>
+          <button class="fb-btn" data-filter="active">Active</button>
+          <button class="fb-btn" data-filter="sold">Sold</button>
+          <button class="fb-btn" data-filter="pending">Pending</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Item</th><th>Price</th><th>Views</th><th>Saves</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
+            <tbody id="listingsTbody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="listingsEmpty" style="display:none">
+          <div class="es-ico">📦</div>
+          <div class="es-title">No listings yet</div>
+          <div class="es-sub">Start selling your unused items</div>
+          <a href="../sell/index.html" class="btn-es">List Your First Item</a>
+        </div>
+      </section>
+
+      <!-- ── WISHLIST ── -->
+      <section class="tab-panel" id="tab-wishlist">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">My Wishlist</h2>
+            <p class="panel-sub">Items you've saved for later</p>
+          </div>
+          <a href="../home/index.html" class="btn-action">Browse More →</a>
+        </div>
+        <div class="wish-grid" id="wishGrid"></div>
+        <div class="empty-state" id="wishEmpty" style="display:none">
+          <div class="es-ico">❤️</div>
+          <div class="es-title">Wishlist is empty</div>
+          <div class="es-sub">Browse and save items you like</div>
+          <a href="../home/index.html" class="btn-es">Browse Listings</a>
+        </div>
+      </section>
+
+      <!-- ── MESSAGES ── -->
+      <section class="tab-panel" id="tab-messages">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Messages</h2>
+            <p class="panel-sub">Conversations with buyers and sellers</p>
+          </div>
+        </div>
+        <div class="msg-layout">
+          <div class="conv-list" id="convList"></div>
+          <div class="chat-pane" id="chatPane">
+            <div class="chat-placeholder" id="chatPlaceholder">
+              <div style="font-size:2.5rem;margin-bottom:10px">💬</div>
+              <div style="font-size:13px;color:var(--txt3)">Select a conversation</div>
+            </div>
+            <div class="chat-active" id="chatActive" style="display:none">
+              <div class="chat-hdr"      id="chatHdr"></div>
+              <div class="chat-msgs"     id="chatMsgs"></div>
+              <div class="chat-inp-row">
+                <textarea id="chatInput" rows="1" placeholder="Type a message…" maxlength="300"></textarea>
+                <button class="btn-send" id="chatSendBtn">↑</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── MY REQUESTS ── -->
+      <section class="tab-panel" id="tab-requests">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">My Requests</h2>
+            <p class="panel-sub">Items you are looking for — get notified when listed</p>
+          </div>
+        </div>
+
+        <!-- New Request Form -->
+        <div class="req-form-card" id="reqFormCard">
+          <div class="rfc-title">+ Request an Item</div>
+          <div class="rfc-body">
+            <div class="rfc-field">
+              <label>What are you looking for? <span style="color:var(--red)">*</span></label>
+              <input type="text" id="reqTitle" placeholder="e.g. Discrete Mathematics by Rosen" maxlength="120"/>
+            </div>
+            <div class="rfc-row2">
+              <div class="rfc-field">
+                <label>Category</label>
+                <select id="reqCategory">
+                  <option value="">Any category</option>
+                  <option value="1">📗 Books</option>
+                  <option value="2">💻 Electronics</option>
+                  <option value="3">🛋️ Furniture</option>
+                  <option value="4">🎒 Accessories</option>
+                  <option value="5">✏️ Stationery</option>
+                  <option value="6">👕 Clothing</option>
+                </select>
+              </div>
+              <div class="rfc-field">
+                <label>Max budget (₹)</label>
+                <input type="number" id="reqMaxPrice" placeholder="e.g. 300" min="1"/>
+              </div>
+            </div>
+            <div class="rfc-field">
+              <label>Additional details</label>
+              <textarea id="reqDesc" rows="2" placeholder="Edition, colour, condition you want…" maxlength="300"></textarea>
+            </div>
+            <button class="btn-submit-req" id="submitReqBtn">📋 Submit Request</button>
+          </div>
+        </div>
+
+        <!-- Requests List -->
+        <div class="req-list" id="reqList"></div>
+        <div class="empty-state" id="reqEmpty" style="display:none">
+          <div class="es-ico">📋</div>
+          <div class="es-title">No requests yet</div>
+          <div class="es-sub">Submit a request above — we will notify you when a matching item is listed</div>
+        </div>
+      </section>
+
+      <!-- ── SETTINGS ── -->
+      <section class="tab-panel" id="tab-settings">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Account Settings</h2>
+            <p class="panel-sub">Manage your profile and preferences</p>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-card">
+            <div class="sc-title">Profile Information</div>
+            <div class="sc-form">
+              <div class="sc-av-row">
+                <div class="sc-av" id="scAv">U</div>
+                <button class="sc-ch-av">Change Photo</button>
+              </div>
+              <div class="sc-row2">
+                <div class="sc-field"><label>First Name</label><input type="text" id="scFirst"/></div>
+                <div class="sc-field"><label>Last Name</label><input type="text" id="scLast"/></div>
+              </div>
+              <div class="sc-field">
+                <label>College Email</label>
+                <div style="position:relative">
+                  <input type="email" id="scEmail" disabled/>
+                  <span class="sc-verified">✓ Verified</span>
+                </div>
+              </div>
+              <div class="sc-field"><label>Phone (optional)</label><input type="tel" id="scPhone" placeholder="+91 XXXXX XXXXX"/></div>
+              <div class="sc-field"><label>Hostel / Location</label><input type="text" id="scLocation" placeholder="e.g. Hostel Block A, Room 204"/></div>
+              <div class="sc-field"><label>Bio</label><textarea id="scBio" rows="2" maxlength="150" placeholder="Tell buyers about yourself…"></textarea></div>
+              <button class="btn-save" id="saveProfileBtn">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="sc-title">Notifications</div>
+            <div class="notif-list">
+              <div class="notif-row"><div><div class="n-lbl">New messages</div><div class="n-sub">When a buyer contacts you</div></div><label class="tog"><input type="checkbox" checked/><span></span></label></div>
+              <div class="notif-row"><div><div class="n-lbl">Item wishlisted</div><div class="n-sub">Someone saved your listing</div></div><label class="tog"><input type="checkbox" checked/><span></span></label></div>
+              <div class="notif-row"><div><div class="n-lbl">Price drop alerts</div><div class="n-sub">On your wishlisted items</div></div><label class="tog"><input type="checkbox"/><span></span></label></div>
+              <div class="notif-row"><div><div class="n-lbl">Campus updates</div><div class="n-sub">UniTrade news and tips</div></div><label class="tog"><input type="checkbox"/><span></span></label></div>
+            </div>
+          </div>
+
+          <div class="settings-card danger-zone">
+            <div class="sc-title">Danger Zone</div>
+            <div class="dz-row">
+              <div><div class="dz-lbl">Delete Account</div><div class="dz-sub">Permanently remove your account and all listings</div></div>
+              <button class="btn-danger" id="deleteAccBtn">Delete Account</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content-area -->
+  </div><!-- /page-wrap -->
+
+  <!-- Edit modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box wide">
+      <div class="modal-hdr"><span>Edit Listing</span><button class="modal-x" id="editClose">✕</button></div>
+      <div class="sc-form" style="padding:0">
+        <div class="sc-field"><label>Title</label><input type="text" id="efTitle" maxlength="80"/></div>
+        <div class="sc-row2">
+          <div class="sc-field"><label>Price (₹)</label><input type="number" id="efPrice" min="1"/></div>
+          <div class="sc-field"><label>Status</label>
+            <select id="efStatus"><option value="active">Active</option><option value="sold">Sold</option><option value="pending">Pending</option></select>
+          </div>
+        </div>
+        <div class="sc-field"><label>Description</label><textarea id="efDesc" rows="3" maxlength="500"></textarea></div>
+        <div class="modal-btns"><button class="btn-cancel-m" id="editCancelBtn">Cancel</button><button class="btn-save" id="editSaveBtn">Save Changes</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <div style="font-size:2.5rem;text-align:center;margin-bottom:10px">🗑️</div>
+      <div class="modal-ttl">Delete this listing?</div>
+      <div class="modal-sub">This cannot be undone.</div>
+      <div class="modal-btns"><button class="btn-cancel-m" id="delCancelBtn">Cancel</button></div>
+      <div><button class="btn-danger" id="delConfirmBtn">Delete</button></div>
+
+    </div>
+  </div>
+
+<!-- JS -->
+<script src="./script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniTrade — Login</title>
+  <link rel="stylesheet" href="./style.css"/>
+</head>
+<body>
+
+  <canvas id="campusCanvas"></canvas>
+
+  <div class="building-wrap">
+    <svg viewBox="0 0 900 300" preserveAspectRatio="xMidYMax meet">
+      <rect x="300" y="80" width="300" height="220" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <rect x="320" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <rect x="356" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <rect x="392" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <rect x="428" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <rect x="464" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <rect x="500" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <rect x="536" y="120" width="16" height="180" fill="rgba(255,255,255,0.04)"/>
+      <polygon points="290,80 610,80 450,18" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <rect x="422" y="-18" width="56" height="100" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <circle cx="450" cy="18" r="19" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
+      <line id="cmin" x1="450" y1="18" x2="450" y2="5" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+      <line id="chr"  x1="450" y1="18" x2="460" y2="18" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+      <polygon points="440,-18 460,-18 450,-52" fill="rgba(255,255,255,0.07)"/>
+      <rect x="100" y="140" width="200" height="160" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="600" y="140" width="200" height="160" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="120" y="162" width="28" height="32" fill="rgba(100,120,255,0.1)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="162" y="162" width="28" height="32" fill="rgba(255,180,60,0.09)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="204" y="162" width="28" height="32" fill="rgba(100,120,255,0.08)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="120" y="208" width="28" height="32" fill="rgba(255,180,60,0.09)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="162" y="208" width="28" height="32" fill="rgba(100,120,255,0.1)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="620" y="162" width="28" height="32" fill="rgba(255,180,60,0.09)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="662" y="162" width="28" height="32" fill="rgba(100,120,255,0.1)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="704" y="162" width="28" height="32" fill="rgba(100,120,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="620" y="208" width="28" height="32" fill="rgba(100,120,255,0.1)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="662" y="208" width="28" height="32" fill="rgba(255,180,60,0.09)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+      <rect x="418" y="226" width="64" height="74" rx="32" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+      <rect x="378" y="296" width="144" height="5" fill="rgba(255,255,255,0.04)"/>
+      <rect x="0" y="298" width="900" height="4" fill="rgba(255,255,255,0.05)"/>
+      <circle cx="68" cy="222" r="32" fill="rgba(34,197,94,0.07)"/>
+      <rect x="65" y="252" width="5" height="48" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="832" cy="222" r="32" fill="rgba(34,197,94,0.07)"/>
+      <rect x="829" y="252" width="5" height="48" fill="rgba(255,255,255,0.03)"/>
+      <line x1="450" y1="-52" x2="450" y2="-78" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+      <polygon points="450,-78 476,-72 450,-66" fill="rgba(79,70,229,0.55)"/>
+      <text x="450" y="58" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.2)" font-family="serif" letter-spacing="3">UNIVERSITAS CAMPUS</text>
+    </svg>
+  </div>
+
+  <div class="act-label" style="top:12%;left:4%">📚 Studying</div>
+  <div class="act-label" style="top:18%;right:5%">💻 Coding</div>
+  <div class="act-label" style="top:55%;left:3%">☕ Coffee run</div>
+  <div class="act-label" style="top:60%;right:4%">🎧 Chilling</div>
+  <div class="act-label" style="top:35%;left:2%">🛒 Buying</div>
+  <div class="act-label" style="top:40%;right:3%">📦 Selling</div>
+
+  <div class="bg-overlay"></div>
+
+  <div class="card-wrap">
+    <div class="login-card">
+
+      <div class="brand-row">
+        <div class="logo">UT</div>
+        <div>
+          <div class="brand-name">UniTrade</div>
+          <div class="brand-tag">Campus Marketplace · Student Portal</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="signin">Sign In</button>
+        <button class="tab" data-tab="signup">Sign Up</button>
+      </div>
+
+      <div class="alert error-msg" id="errorMsg"></div>
+      <div class="alert success-msg" id="successMsg"></div>
+
+      <!-- ── Sign In ── -->
+      <form class="form active" id="signinForm" novalidate>
+        <div class="field">
+          <label>College Email</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+            <input type="email" id="siEmail" placeholder="you@college.ac.in" autocomplete="email"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <input type="password" id="siPass" placeholder="Your password"/>
+            <button type="button" class="eye-btn" data-target="siPass">👁️</button>
+          </div>
+        </div>
+        <div class="row-between">
+          <label class="check-label"><input type="checkbox"/> Remember me</label>
+          <a href="#" class="link-sm">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-main" id="siBtn">Sign In</button>
+        <div class="or-div"><span>or continue with</span></div>
+        <button type="button" class="btn-google">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+          Sign in with Google
+        </button>
+      </form>
+
+      <!-- ── Sign Up ── -->
+      <form class="form" id="signupForm" novalidate>
+        <div class="field-row2">
+          <div class="field">
+            <label>First Name</label>
+            <div class="inp-wrap">
+              <svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+              <input type="text" id="suFirst" placeholder="Priya"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Last Name</label>
+            <div class="inp-wrap" style="padding-left:0">
+              <input type="text" id="suLast" placeholder="Chauhan" style="padding-left:14px"/>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>College Email</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+            <input type="email" id="suEmail" placeholder="you@college.ac.in"/>
+          </div>
+          <span class="hint" id="emailHint"></span>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <input type="password" id="suPass" placeholder="Min 6 characters"/>
+            <button type="button" class="eye-btn" data-target="suPass">👁️</button>
+          </div>
+          <div class="strength-wrap"><div class="strength-bar" id="strengthBar"></div></div>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <input type="password" id="suConfirm" placeholder="Repeat password"/>
+          </div>
+        </div>
+        <label class="check-label">
+          <input type="checkbox" id="agreeCheck"/>
+          I agree to the <a href="#" class="link-sm">Terms of Service</a>
+        </label>
+        <button type="submit" class="btn-main" id="suBtn">Create Account</button>
+      </form>
+
+    </div>
+  </div>
+
+  <div class="page-fade" id="pageFade"></div>
+  <script src="./script.js"></script>
+</body>
+</html>
