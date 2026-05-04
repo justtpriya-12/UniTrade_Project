@@ -317,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Invalid email or password.');
 
-      // Save real token + user from database
       localStorage.setItem('ut_token', data.token);
       localStorage.setItem('ut_user',  JSON.stringify(data.user));
 
@@ -333,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ════════════════════════════════════
-  //  SIGN UP — Real API
+  //  SIGN UP — Real API (with phone)
   // ════════════════════════════════════
   document.getElementById('signupForm').addEventListener('submit', async e => {
     e.preventDefault();
@@ -341,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const first    = document.getElementById('suFirst').value.trim();
     const last     = document.getElementById('suLast').value.trim();
     const email    = document.getElementById('suEmail').value.trim();
+    const phone    = document.getElementById('suPhone').value.trim();
     const password = document.getElementById('suPass').value;
     const confirm  = document.getElementById('suConfirm').value;
     const agreed   = document.getElementById('agreeCheck').checked;
@@ -359,12 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const res  = await fetch(`${API}/api/auth/register`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ name: `${first} ${last}`, email, password })
+        body:    JSON.stringify({ name: `${first} ${last}`, email, password, phone: phone || null })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed.');
 
-      // Save real token + user from database
       localStorage.setItem('ut_token', data.token);
       localStorage.setItem('ut_user',  JSON.stringify(data.user));
 

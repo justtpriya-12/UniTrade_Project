@@ -4,11 +4,12 @@
 const bcrypt = require('bcryptjs');
 const jwt    = require('jsonwebtoken');
 const db     = require('../config/db');
+const { notifyRegistration } = require('../services/notify');
 
 // ── REGISTER ────────────────────────────────────────────────
 async function register(req, res) {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     // 1. Check all fields are provided
     if (!name || !email || !password) {
@@ -31,10 +32,10 @@ async function register(req, res) {
     // 4. Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 5. Save user to database
+    // 5. Save user to database (with phone)
     const [result] = await db.query(
-      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-      [name.trim(), email.toLowerCase().trim(), hashedPassword]
+      'INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)',
+      [name.trim(), email.toLowerCase().trim(), hashedPassword, phone || null]
     );
 
     // 6. Create JWT token
@@ -55,6 +56,13 @@ async function register(req, res) {
         role:  'user'
       }
     });
+
+    // 8. Fire WhatsApp + SMS welcome notification in background
+    // Does NOT block the response — fires after res.json()
+    if (phone) {
+      notifyRegistration({ name: name.trim(), phone })
+        .catch(err => console.error('Notify registration error:', err));
+    }
 
   } catch (err) {
     console.error('Register error:', err);

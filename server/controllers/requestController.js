@@ -1,6 +1,7 @@
 // server/controllers/requestController.js
 
 const db = require('../config/db');
+const { notifyRequestMatch } = require('../services/notify');
 
 /* ─────────────────────────────────────────────────────────────
    HELPER — create a notification for a user
@@ -77,7 +78,7 @@ async function getMyRequests(req, res) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   GET /api/requests — Get all open requests (public — for sellers to see)
+   GET /api/requests — Get all open requests (public)
 ───────────────────────────────────────────────────────────── */
 async function getAllRequests(req, res) {
   try {
@@ -167,13 +168,13 @@ async function markOneRead(req, res) {
    INTERNAL — checkAndNotifyRequests
    Called by productController when a new product is created
    Checks if the new product matches any open requests
-   If match found → sends in-app notification to requester
+   If match found → sends in-app + WhatsApp + SMS notification
 ───────────────────────────────────────────────────────────── */
 async function checkAndNotifyRequests(product) {
   try {
-    // Find all open requests that match by category or keywords in title
+    // Find all open requests that match — also fetch phone number
     const [openRequests] = await db.query(
-      `SELECT r.*, u.name AS user_name
+      `SELECT r.*, u.name AS user_name, u.phone AS phone
        FROM requests r
        JOIN users u ON r.user_id = u.id
        WHERE r.status = 'open'
@@ -186,16 +187,22 @@ async function checkAndNotifyRequests(product) {
       [product.user_id, product.category_id, product.title, product.title]
     );
 
+    // Get seller name for WhatsApp message
+    const [[seller]] = await db.query(
+      'SELECT name FROM users WHERE id = ?',
+      [product.user_id]
+    );
+    const sellerName = seller ? seller.name : 'A student';
+
     for (const request of openRequests) {
-      // Check price — only notify if product price is within their budget
+      // Skip if product is over budget
       if (request.max_price && Number(product.price) > Number(request.max_price)) {
-        continue; // product is too expensive for this request
+        continue;
       }
 
-      // Get product URL
-      const productLink = `/product/index.html?id=${product.id}`;
+      const productLink = `https://unitrade-project-1.onrender.com/product/index.html?id=${product.id}`;
 
-      // Send in-app notification to the requester
+      // 1. Save in-app notification to database
       await createNotification({
         user_id:    request.user_id,
         type:       'request_match',
@@ -206,11 +213,24 @@ async function checkAndNotifyRequests(product) {
         request_id: request.id
       });
 
-      console.log(`✅ Notification sent to user ${request.user_id} for request "${request.title}"`);
+      console.log(`✅ In-app notification sent to user ${request.user_id} for request "${request.title}"`);
+
+      // 2. Send WhatsApp + SMS notification if phone exists
+      if (request.phone) {
+        notifyRequestMatch({
+          phone:         request.phone,
+          requesterName: request.user_name || 'Student',
+          requestTitle:  request.title,
+          productTitle:  product.title,
+          sellerName,
+          price:         product.price,
+          productId:     product.id
+        }).catch(e => console.error('Request match WhatsApp error:', e));
+      }
     }
   } catch (err) {
     console.error('checkAndNotifyRequests error:', err);
-    // Don't throw — this is a background task, don't break product creation
+    // Don't throw — background task, never break product creation
   }
 }
 
@@ -222,5 +242,5 @@ module.exports = {
   getNotifications,
   markAllRead,
   markOneRead,
-  checkAndNotifyRequests  // exported so productController can call it
+  checkAndNotifyRequests
 };

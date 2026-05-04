@@ -1,6 +1,7 @@
 // server/controllers/messageController.js
 
 const db = require('../config/db');
+const { notifySellerNewMessage } = require('../services/notify');
 
 // ── GET MY CONVERSATIONS ─────────────────────────────────────
 async function getConversations(req, res) {
@@ -80,10 +81,49 @@ async function sendMessage(req, res) {
       [req.user.id, receiver_id, product_id, body.trim()]
     );
 
+    // Send response immediately
     res.status(201).json({
-      message: 'Message sent.',
+      message:   'Message sent.',
       messageId: result.insertId
     });
+
+    // Notify seller via WhatsApp + SMS in background
+    // Fires AFTER response — never slows down the chat
+    ;(async () => {
+      try {
+        // Get seller phone number
+        const [[seller]] = await db.query(
+          'SELECT name, phone FROM users WHERE id = ?',
+          [receiver_id]
+        );
+
+        // Get buyer name
+        const [[buyer]] = await db.query(
+          'SELECT name FROM users WHERE id = ?',
+          [req.user.id]
+        );
+
+        // Get product title
+        const [[product]] = await db.query(
+          'SELECT title FROM products WHERE id = ?',
+          [product_id]
+        );
+
+        // Only send if seller has a phone number
+        if (seller && seller.phone) {
+          await notifySellerNewMessage({
+            phone:        seller.phone,
+            sellerName:   seller.name,
+            buyerName:    buyer  ? buyer.name    : 'A student',
+            productTitle: product ? product.title : 'your listing',
+            productId:    product_id
+          });
+        }
+      } catch (e) {
+        console.error('Message notify error:', e);
+      }
+    })();
+
   } catch (err) {
     console.error('Send message error:', err);
     res.status(500).json({ message: 'Server error.' });

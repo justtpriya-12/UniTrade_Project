@@ -10,6 +10,12 @@ function getNotifier() {
   return require('./requestController').checkAndNotifyRequests;
 }
 
+// Import WhatsApp/SMS notification service
+const {
+  notifySellerProductListed,
+  notifyAllUsersNewProduct
+} = require('../services/notify');
+
 // ── GET ALL PRODUCTS ─────────────────────────────────────────
 async function getAllProducts(req, res) {
   try {
@@ -53,7 +59,7 @@ async function getAllProducts(req, res) {
       params.push(condition);
     }
 
-    if (sort === 'price_asc')  sql += ' ORDER BY p.price ASC';
+    if (sort === 'price_asc')       sql += ' ORDER BY p.price ASC';
     else if (sort === 'price_desc') sql += ' ORDER BY p.price DESC';
     else if (sort === 'popular')    sql += ' ORDER BY p.views DESC';
     else                            sql += ' ORDER BY p.created_at DESC';
@@ -141,7 +147,7 @@ async function createProduct(req, res) {
       const imageRows = req.files.map((file, index) => [
         productId,
         `/uploads/${file.filename}`,
-        index === 0 ? 1 : 0, // first image is cover
+        index === 0 ? 1 : 0,
         index
       ]);
       await db.query(
@@ -150,19 +156,69 @@ async function createProduct(req, res) {
       );
     }
 
+    // Send response immediately — don't wait for notifications
     res.status(201).json({
       message: 'Listing created successfully.',
       productId
     });
 
-    // ── Fire notifications in background (don't await — don't slow response)
-    getNotifier()({
-      id:          productId,
-      user_id:     req.user.id,
-      title:       title.trim(),
-      price:       Number(price),
-      category_id: Number(category_id)
-    }).catch(err => console.error('Notify error:', err));
+    // ── Fire ALL notifications in background ──────────────────
+    // None of these block the response — all run after res.json()
+    ;(async () => {
+      try {
+        // 1. In-app request matching notifications
+        await getNotifier()({
+          id:          productId,
+          user_id:     req.user.id,
+          title:       title.trim(),
+          price:       Number(price),
+          category_id: Number(category_id)
+        });
+
+        // 2. Get seller info + category name from DB
+        const [[seller]] = await db.query(
+          'SELECT name, phone FROM users WHERE id = ?',
+          [req.user.id]
+        );
+        const [[cat]] = await db.query(
+          'SELECT name FROM categories WHERE id = ?',
+          [Number(category_id)]
+        );
+        const catName = cat ? cat.name : 'General';
+
+        // 3. Notify seller — "Your listing is live!"
+        if (seller && seller.phone) {
+          await notifySellerProductListed({
+            sellerName:   seller.name,
+            phone:        seller.phone,
+            productTitle: title.trim(),
+            price:        Number(price),
+            productId
+          });
+        }
+
+        // 4. Broadcast to ALL other users who have phone numbers
+        const [allUsers] = await db.query(
+          'SELECT phone FROM users WHERE phone IS NOT NULL AND phone != "" AND id != ?',
+          [req.user.id]
+        );
+        const allPhones = allUsers.map(u => u.phone).filter(Boolean);
+
+        if (allPhones.length > 0) {
+          await notifyAllUsersNewProduct({
+            sellerName:   seller ? seller.name : 'A student',
+            productTitle: title.trim(),
+            price:        Number(price),
+            category:     catName,
+            productId,
+            allPhones
+          });
+        }
+
+      } catch (err) {
+        console.error('Background notification error:', err);
+      }
+    })();
 
   } catch (err) {
     console.error('Create product error:', err);
