@@ -26,12 +26,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-function conditionBadge(c) {
-  const cls = { new: 'badge-new', good: 'badge-good', fair: 'badge-fair' };
-  const lbl = { new: 'Like New',  good: 'Good',       fair: 'Fair'      };
-  return [cls[c] || '', lbl[c] || c];
-}
-
 function navigate(path) {
   const fade = document.getElementById('pageFade');
   fade.classList.add('on');
@@ -46,6 +40,12 @@ function getCategoryIcon(slug) {
   return icons[slug] || '📦';
 }
 
+function condClass(c) {
+  const cls = { new: 'gtag-new', good: 'gtag-good', fair: 'gtag-fair' };
+  const lbl = { new: 'Like New',  good: 'Good',      fair: 'Fair'     };
+  return [cls[c] || 'gtag-good', lbl[c] || c];
+}
+
 /* ─────────────────────────────────────
    FETCH PRODUCT FROM REAL API
 ───────────────────────────────────── */
@@ -53,10 +53,8 @@ async function loadProduct(id) {
   try {
     const res  = await fetch(`${API}/api/products/${id}`);
     const data = await res.json();
-
     if (!res.ok) throw new Error(data.message || 'Product not found.');
     return data.product;
-
   } catch (err) {
     console.error('Load product error:', err);
     return null;
@@ -88,22 +86,20 @@ function buildGallery(product) {
   const icon     = getCategoryIcon(product.category_slug);
 
   if (images.length > 0) {
-    // Real images from server
     const coverImg = images.find(i => i.is_cover) || images[0];
-
     mainImg.innerHTML = `
       <img src="${API}${coverImg.image_path}"
            alt="${product.title}"
-           style="width:100%;height:100%;object-fit:cover;border-radius:var(--r)"
-           onerror="this.outerHTML='<span style=\\'font-size:6rem\\'>${icon}</span>'"
+           style="width:100%;height:100%;object-fit:cover"
+           onerror="this.outerHTML='<div class=main-img-inner style=font-size:6rem>${icon}</div>'"
       />`;
 
     thumbRow.innerHTML = images.map((img, i) => `
-      <div class="thumb${i === 0 ? ' active' : ''}" data-idx="${i}" data-src="${API}${img.image_path}">
+      <div class="thumb${i === 0 ? ' active' : ''}" data-src="${API}${img.image_path}">
         <img src="${API}${img.image_path}"
              alt="photo ${i+1}"
-             style="width:100%;height:100%;object-fit:cover;border-radius:6px"
-             onerror="this.outerHTML='<span>${icon}</span>'"
+             style="width:100%;height:100%;object-fit:cover"
+             onerror="this.outerHTML='${icon}'"
         />
       </div>`).join('');
 
@@ -114,16 +110,14 @@ function buildGallery(product) {
         mainImg.innerHTML = `
           <img src="${th.dataset.src}"
                alt="${product.title}"
-               style="width:100%;height:100%;object-fit:cover;border-radius:var(--r)"
-               onerror="this.outerHTML='<span style=\\'font-size:6rem\\'>${icon}</span>'"
+               style="width:100%;height:100%;object-fit:cover"
+               onerror="this.outerHTML='<div class=main-img-inner style=font-size:6rem>${icon}</div>'"
           />`;
       });
     });
-
   } else {
-    // No images — show category emoji
-    mainImg.innerHTML = `<span style="font-size:6rem">${icon}</span>`;
-    thumbRow.innerHTML = `<div class="thumb active"><span style="font-size:1.6rem">${icon}</span></div>`;
+    mainImg.innerHTML = `<div class="main-img-inner" style="font-size:6rem">${icon}</div>`;
+    thumbRow.innerHTML = `<div class="thumb active"><div style="font-size:1.6rem">${icon}</div></div>`;
   }
 }
 
@@ -134,41 +128,48 @@ function renderProduct(product, user) {
   document.title = `UniTrade — ${product.title}`;
 
   // Breadcrumb
-  const bcEl = document.getElementById('bcCurrent');
-  if (bcEl) bcEl.textContent = product.title;
+  const bcEl  = document.getElementById('bcCurrent');
+  const bcCat = document.getElementById('bcCategory');
+  if (bcEl)  bcEl.textContent  = product.title;
+  if (bcCat) bcCat.textContent = product.category_name || product.category_slug || 'Category';
 
   // Gallery
   buildGallery(product);
 
-  // Condition badge
-  const [badgeCls, badgeLbl] = conditionBadge(product.condition_type);
-  const badge = document.getElementById('conditionBadge');
-  if (badge) { badge.textContent = badgeLbl; badge.className = `img-badge ${badgeCls}`; }
+  // Condition tag under image  — CSS: .gtag .gtag-new/good/fair
+  const [condCls, condLbl] = condClass(product.condition_type);
+  const galleryTags = document.getElementById('galleryTags');
+  if (galleryTags) {
+    galleryTags.innerHTML = `<span class="gtag ${condCls}">${condLbl}</span>`;
+    if (product.status === 'sold') galleryTags.innerHTML += `<span class="gtag gtag-sold">🔴 Sold</span>`;
+  }
 
-  // Main info
+  // Main info  — CSS: .info-category, .info-title, .info-price, .info-desc
   document.getElementById('infoCat').textContent   = (product.category_name || product.category_slug || 'General').toUpperCase();
   document.getElementById('infoTitle').textContent = product.title;
   document.getElementById('infoPrice').textContent = `₹${Number(product.price).toLocaleString('en-IN')}`;
-  document.getElementById('payBtn').addEventListener('click', () => {
-  initiatePayment(product);  // product loaded from API
-  });
+  document.getElementById('infoDesc').textContent  = product.description || 'No description provided.';
+
+  // Pay button amount
+  const payAmountEl = document.getElementById('payAmount');
+  if (payAmountEl) payAmountEl.textContent = Number(product.price).toLocaleString('en-IN');
+
+  // Wire pay button
+  document.getElementById('payBtn')?.addEventListener('click', () => initiatePayment(product));
 
   // Location
   const locEl = document.getElementById('priceOg');
   if (locEl) locEl.textContent = product.location ? `📍 ${product.location}` : '📍 Campus';
 
-  // Description
-  document.getElementById('infoDesc').textContent = product.description || 'No description provided.';
-
-  // Meta chips
-  const posted   = new Date(product.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
-  const metaEl   = document.getElementById('metaChips');
+  // Meta pills  — CSS: .meta-pills .mpill
+  const posted = new Date(product.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  const metaEl = document.getElementById('metaChips');
   if (metaEl) {
     metaEl.innerHTML = `
-      <span class="meta-chip">📅 ${posted}</span>
-      <span class="meta-chip">🏷️ ${product.category_name || product.category_slug}</span>
-      <span class="meta-chip ${badgeCls}">${badgeLbl}</span>
-      <span class="meta-chip">👁️ ${product.views || 0} views</span>`;
+      <span class="mpill">📅 ${posted}</span>
+      <span class="mpill">🏷️ ${product.category_name || product.category_slug}</span>
+      <span class="mpill">${condLbl}</span>
+      <span class="mpill">👁️ ${product.views || 0} views</span>`;
   }
 
   // Original price / discount
@@ -177,45 +178,50 @@ function renderProduct(product, user) {
     const origEl   = document.getElementById('origPrice');
     if (origEl) {
       origEl.innerHTML = `
-        <span style="text-decoration:line-through;color:var(--txt-muted)">
+        <span style="text-decoration:line-through;color:var(--txt3)">
           ₹${Number(product.orig_price).toLocaleString('en-IN')}
         </span>
-        <span style="background:#f0fdf4;color:#15803d;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700">
-          ${discount}% off
-        </span>`;
+        <span class="price-tag">${discount}% off</span>`;
     }
   }
 
-  // Seller info
+  // Seller  — CSS: .sc-av, .sc-name, .sc-meta, .sc-stats
   const initials = (product.seller_name || 'U').slice(0, 2).toUpperCase();
-  document.getElementById('sellerAv').textContent    = initials;
-  document.getElementById('sellerName').textContent  = product.seller_name || 'Student';
-  document.getElementById('sellerMeta').textContent  = 'Verified campus student · UniTrade seller';
-  document.getElementById('sellerStats').innerHTML   =
-    `<div class="sv">${product.seller_id || ''}</div><div class="sl">Seller ID</div>`;
-  const mbSellerEl = document.getElementById('mbSellerName');
-  if (mbSellerEl) mbSellerEl.textContent = product.seller_name || 'Seller';
+  document.getElementById('sellerAv').textContent   = initials;
+  document.getElementById('sellerName').textContent = product.seller_name || 'Student';
+  document.getElementById('sellerMeta').textContent = 'Verified campus student · UniTrade seller';
+  const sellerStats = document.getElementById('sellerStats');
+  if (sellerStats) {
+    sellerStats.innerHTML = `
+      <div class="sc-stat">
+        <span>${product.seller_id || ''}</span>
+        Seller ID
+      </div>`;
+  }
 
-  // Wishlist button state
+  // Mirror seller name into contact modal
+  const modalSellerAv   = document.getElementById('modalSellerAv');
+  const modalSellerName = document.getElementById('modalSellerName');
+  if (modalSellerAv)   modalSellerAv.textContent   = initials;
+  if (modalSellerName) modalSellerName.textContent = product.seller_name || 'Seller';
+
+  // Wishlist state
   updateWishlistUI(product.id);
 
-  // Owner vs buyer view
+  // Owner vs buyer  — CSS: .own-panel, .buyer-actions
   const isOwner = user && (user.id === product.seller_id || user.email === product.seller_email);
   const ownerEl = document.getElementById('ownerActions');
   const buyerEl = document.getElementById('buyerActions');
-  if (ownerEl) ownerEl.style.display = isOwner ? 'flex' : 'none';
-  if (buyerEl) buyerEl.style.display = isOwner ? 'none' : 'flex';
+  if (ownerEl) ownerEl.style.display = isOwner ? 'block' : 'none';
+  if (buyerEl) buyerEl.style.display = isOwner ? 'none'  : 'flex';
 
-  // Sold overlay
-  if (product.status === 'sold') {
-    const soldBanner = document.createElement('div');
-    soldBanner.style.cssText = 'background:#ef4444;color:#fff;text-align:center;padding:8px;font-weight:700;font-size:13px;border-radius:var(--r) var(--r) 0 0;';
-    soldBanner.textContent   = '🔴 This item has been sold';
-    document.getElementById('mainImg').prepend(soldBanner);
-    if (buyerEl) buyerEl.style.pointerEvents = 'none', buyerEl.style.opacity = '0.5';
+  // Sold state
+  if (product.status === 'sold' && buyerEl) {
+    buyerEl.style.pointerEvents = 'none';
+    buyerEl.style.opacity = '0.5';
   }
 
-  // Show layout
+  // Show layout, hide skeleton
   document.getElementById('skeletonWrap').style.display  = 'none';
   document.getElementById('productLayout').style.display = 'grid';
 }
@@ -228,49 +234,41 @@ function renderSimilar(products) {
   if (!grid) return;
 
   if (!products.length) {
-    grid.innerHTML = '<div style="color:var(--txt-muted);font-size:13px;padding:1rem">No similar listings found.</div>';
+    grid.innerHTML = '<div style="color:var(--txt3);font-size:13px;padding:1rem">No similar listings found.</div>';
     return;
   }
 
   grid.innerHTML = products.map(p => {
     const icon = getCategoryIcon(p.category_slug);
     const img  = p.cover_image
-      ? `<img src="${API}${p.cover_image}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='<span style=\\'font-size:1.6rem\\'>${icon}</span>'">`
-      : `<span style="font-size:1.6rem">${icon}</span>`;
-
+      ? `<img src="${API}${p.cover_image}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover">`
+      : icon;
     return `
-      <div class="sim-card" onclick="navigate('index.html?id=${p.id}')">
-        <div class="sim-icon">${img}</div>
-        <div class="sim-info">
-          <div class="sim-title">${p.title}</div>
-          <div class="sim-price">₹${Number(p.price).toLocaleString('en-IN')}</div>
+      <div class="rc" onclick="navigate('index.html?id=${p.id}')">
+        <div class="rc-img">${img}</div>
+        <div class="rc-body">
+          <div class="rc-title">${p.title}</div>
+          <div class="rc-price">₹${Number(p.price).toLocaleString('en-IN')}</div>
         </div>
       </div>`;
   }).join('');
 }
 
 /* ─────────────────────────────────────
-   WISHLIST — calls real API
+   WISHLIST
 ───────────────────────────────────── */
 function updateWishlistUI(id) {
-  const w     = wishlist.includes(id);
-  const fab   = document.getElementById('wishlistFab');
-  const lgBtn = document.getElementById('wishlistLg');
-  if (fab)   fab.textContent   = w ? '❤️' : '🤍';
-  if (lgBtn) lgBtn.textContent = w ? '❤️ Saved' : '🤍 Save';
+  const btn = document.getElementById('wishlistLg');
+  if (btn) btn.textContent = wishlist.includes(id) ? '❤️' : '🤍';
 }
 
 async function toggleWishlist(id) {
   const token = localStorage.getItem('ut_token');
-
   if (token) {
     try {
       const res  = await fetch(`${API}/api/users/me/wishlist`, {
         method:  'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ product_id: id })
       });
       const data = await res.json();
@@ -281,13 +279,8 @@ async function toggleWishlist(id) {
         wishlist = wishlist.filter(x => x !== id);
         showToast('Removed from wishlist');
       }
-    } catch (err) {
-      toggleWishlistLocal(id);
-    }
-  } else {
-    toggleWishlistLocal(id);
-  }
-
+    } catch (err) { toggleWishlistLocal(id); }
+  } else { toggleWishlistLocal(id); }
   saveWishlist();
   updateWishlistUI(id);
 }
@@ -299,27 +292,16 @@ function toggleWishlistLocal(id) {
 }
 
 /* ─────────────────────────────────────
-   SEND MESSAGE — calls real API
+   SEND MESSAGE
 ───────────────────────────────────── */
 async function sendMessage(productId, sellerId, body) {
   const token = localStorage.getItem('ut_token');
-  if (!token) {
-    showToast('Please log in to contact the seller.');
-    return false;
-  }
-
+  if (!token) { showToast('Please log in to contact the seller.'); return false; }
   try {
     const res  = await fetch(`${API}/api/messages`, {
       method:  'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        product_id:  productId,
-        receiver_id: sellerId,
-        body
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ product_id: productId, receiver_id: sellerId, body })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message);
@@ -331,12 +313,12 @@ async function sendMessage(productId, sellerId, body) {
 }
 
 /* ─────────────────────────────────────
-   DELETE PRODUCT — calls real API
+   DELETE PRODUCT
 ───────────────────────────────────── */
 async function deleteProduct(id) {
   const token = localStorage.getItem('ut_token');
   try {
-    const res = await fetch(`${API}/api/products/${id}`, {
+    const res  = await fetch(`${API}/api/products/${id}`, {
       method:  'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -349,55 +331,53 @@ async function deleteProduct(id) {
   }
 }
 
-
 /* ─────────────────────────────────────
    PAYMENT — Razorpay Integration
 ───────────────────────────────────── */
 async function initiatePayment(product) {
   const token = localStorage.getItem('ut_token');
-
-  // Step 1: Create order on server
-  const res   = await fetch(`${API}/api/payment/create-order`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body:    JSON.stringify({ amount: product.price, product_id: product.id })
-  });
-  const { orderId, amount } = await res.json();
-
-  // Step 2: Open Razorpay popup
-  const user = JSON.parse(localStorage.getItem('ut_user'));
-  const options = {
-    key:      'rzp_test_Sk8AKDV1RehX6d',  // your Key ID
-    amount,
-    currency: 'INR',
-    name:     'UniTrade',
-    description: product.title,
-    order_id: orderId,
-    handler: async function(response) {
-      // Step 3: Verify on server
-      const verify = await fetch(`${API}/api/payment/verify`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body:    JSON.stringify({
-          razorpay_order_id:   response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature:  response.razorpay_signature,
-          product_id:          product.id,
-          amount:              product.price
-        })
-      });
-      const data = await verify.json();
-      if (data.message === 'Payment successful!') {
-        showToast('Payment done! Listing marked as sold.');
-        setTimeout(() => navigate('../home/index.html'), 1500);
-      }
-    },
-    prefill: { name: user.name, email: user.email },
-    theme:   { color: '#4F46E5' }  // UniTrade indigo colour
-  };
-
-  const rzp = new window.Razorpay(options);
-  rzp.open();
+  try {
+    const res = await fetch(`${API}/api/payment/create-order`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body:    JSON.stringify({ amount: product.price, product_id: product.id })
+    });
+    const { orderId, amount } = await res.json();
+    const user = JSON.parse(localStorage.getItem('ut_user'));
+    const options = {
+      key:         'PASTE_YOUR_RAZORPAY_KEY_HERE',
+      amount,
+      currency:    'INR',
+      name:        'UniTrade',
+      description: product.title,
+      order_id:    orderId,
+      handler: async function(response) {
+        const verify = await fetch(`${API}/api/payment/verify`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body:    JSON.stringify({
+            razorpay_order_id:   response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature:  response.razorpay_signature,
+            product_id:          product.id,
+            amount:              product.price
+          })
+        });
+        const data = await verify.json();
+        if (data.message === 'Payment successful!') {
+          showToast('Payment done! Listing marked as sold.');
+          setTimeout(() => navigate('../home/index.html'), 1500);
+        }
+      },
+      prefill: { name: user.name, email: user.email },
+      theme:   { color: '#4F46E5' }
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (err) {
+    showToast('Could not initiate payment. Please try again.');
+    console.error('Payment error:', err);
+  }
 }
 
 /* ─────────────────────────────────────
@@ -421,61 +401,61 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Auth guard ──────────────────────────────────────────────
   const userStr = localStorage.getItem('ut_user');
-  if (!userStr) {
-    window.location.href = '../loginpage/index.html';
-    return;
-  }
+  if (!userStr) { window.location.href = '../loginpage/index.html'; return; }
   const user     = JSON.parse(userStr);
   const initials = (user.name || 'U').slice(0, 2).toUpperCase();
   document.getElementById('navAv').textContent    = initials;
   document.getElementById('navUname').textContent = user.name || 'User';
 
-  // ── Get product ID from URL ──────────────────────────────────
-const id = Number(getParam('id'));
+  // ── Get product ID ───────────────────────────────────────────
+  const id = Number(getParam('id'));
+  if (!id) {
+    document.getElementById('skeletonWrap').style.display = 'none';
+    document.getElementById('notFound').style.display     = 'block';
+    return;
+  }
 
-if (!id) {
-  const skeleton = document.getElementById('skeletonWrap');
-  if (skeleton) skeleton.style.display = 'none';
-
-  const notFound = document.getElementById('notFound');
-  if (notFound) notFound.style.display = 'block';
-
-  return;
-}
-
-  // ── Load product from real API ───────────────────────────────
+  // ── Load product ─────────────────────────────────────────────
   const product = await loadProduct(id);
-
   if (!product) {
     document.getElementById('skeletonWrap').style.display = 'none';
     document.getElementById('notFound').style.display     = 'block';
     return;
   }
 
-  // ── Render product ───────────────────────────────────────────
+  // ── Render ───────────────────────────────────────────────────
   renderProduct(product, user);
 
-  // ── Load and render similar products ────────────────────────
+  // ── Similar products ─────────────────────────────────────────
   const similar = await loadSimilar(product.category_slug, product.id);
   renderSimilar(similar);
 
-  // ── Wishlist buttons ─────────────────────────────────────────
-  document.getElementById('wishlistFab')?.addEventListener('click', () => toggleWishlist(id));
-  document.getElementById('wishlistLg')?.addEventListener('click',  () => toggleWishlist(id));
+  // ── Wishlist ─────────────────────────────────────────────────
+  document.getElementById('wishlistLg')?.addEventListener('click', () => toggleWishlist(id));
 
-  // ── Contact seller / send message ────────────────────────────
+  // ── Contact modal ─────────────────────────────────────────────
+  // CSS uses .overlay.open to show the modal (not inline display style)
+  const contactModal = document.getElementById('contactModal');
   document.getElementById('contactBtn')?.addEventListener('click', () => {
-    const mb = document.getElementById('messageBox');
-    if (!mb) return;
-    mb.style.display = mb.style.display === 'none' ? 'flex' : 'none';
-    if (mb.style.display === 'flex') document.getElementById('mbText')?.focus();
+    contactModal?.classList.add('open');
+    document.getElementById('mbText')?.focus();
+  });
+  document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+    contactModal?.classList.remove('open');
+  });
+  contactModal?.addEventListener('click', e => {
+    if (e.target === contactModal) contactModal.classList.remove('open');
   });
 
-  document.getElementById('cancelMsgBtn')?.addEventListener('click', () => {
-    const mb = document.getElementById('messageBox');
-    if (mb) mb.style.display = 'none';
+  // Quick chips
+  document.querySelectorAll('.qchip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ta = document.getElementById('mbText');
+      if (ta) { ta.value = btn.dataset.msg; ta.focus(); }
+    });
   });
 
+  // Send message
   document.getElementById('sendMsgBtn')?.addEventListener('click', async () => {
     const textEl = document.getElementById('mbText');
     const body   = textEl?.value.trim();
@@ -484,17 +464,25 @@ if (!id) {
     const sendBtn = document.getElementById('sendMsgBtn');
     sendBtn.disabled    = true;
     sendBtn.textContent = 'Sending…';
+    sendBtn.classList.add('loading');
 
     const ok = await sendMessage(product.id, product.seller_id, body);
 
-    sendBtn.disabled    = false;
-    sendBtn.textContent = 'Send';
+    sendBtn.disabled = false;
+    sendBtn.classList.remove('loading');
 
     if (ok) {
+      sendBtn.textContent = 'Message Sent ✓';
+      sendBtn.classList.add('sent');
       showToast('Message sent! ✓ The seller will be notified.');
-      const mb = document.getElementById('messageBox');
-      if (mb) mb.style.display = 'none';
-      if (textEl) textEl.value = '';
+      setTimeout(() => {
+        contactModal?.classList.remove('open');
+        sendBtn.textContent = 'Send Message ↑';
+        sendBtn.classList.remove('sent');
+        if (textEl) textEl.value = '';
+      }, 1400);
+    } else {
+      sendBtn.textContent = 'Send Message ↑';
     }
   });
 
@@ -502,10 +490,13 @@ if (!id) {
   document.getElementById('editBtn')?.addEventListener('click', () => {
     navigate(`../sell/index.html?edit=${id}`);
   });
-
-  document.getElementById('deleteBtn')?.addEventListener('click', async () => {
-    if (!confirm('Are you sure you want to delete this listing? This cannot be undone.')) return;
-
+  document.getElementById('deleteBtn')?.addEventListener('click', () => {
+    document.getElementById('deleteModal')?.classList.add('open');
+  });
+  document.getElementById('deleteCancelBtn')?.addEventListener('click', () => {
+    document.getElementById('deleteModal')?.classList.remove('open');
+  });
+  document.getElementById('deleteConfirmBtn')?.addEventListener('click', async () => {
     const ok = await deleteProduct(id);
     if (ok) {
       showToast('Listing deleted successfully.');
