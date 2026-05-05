@@ -3,7 +3,7 @@
 //  Connected to real API
 // ═══════════════════════════════════════
 
-const API = 'https://unitrade-project.onrender.com';
+const API = 'http://localhost:5000';
 
 /* ─────────────────────────────────────
    HELPERS
@@ -149,9 +149,9 @@ function renderProduct(product, user) {
   document.getElementById('infoCat').textContent   = (product.category_name || product.category_slug || 'General').toUpperCase();
   document.getElementById('infoTitle').textContent = product.title;
   document.getElementById('infoPrice').textContent = `₹${Number(product.price).toLocaleString('en-IN')}`;
-  document.getElementById('payBtn').addEventListener('click', () => {
-  initiatePayment(product);  // product loaded from API
-  });
+  // Update Pay button with real price
+  const payLbl = document.getElementById('payAmountLabel');
+  if (payLbl) payLbl.textContent = `₹${Number(product.price).toLocaleString('en-IN')}`;
 
   // Location
   const locEl = document.getElementById('priceOg');
@@ -349,57 +349,6 @@ async function deleteProduct(id) {
   }
 }
 
-
-/* ─────────────────────────────────────
-   PAYMENT — Razorpay Integration
-───────────────────────────────────── */
-async function initiatePayment(product) {
-  const token = localStorage.getItem('ut_token');
-
-  // Step 1: Create order on server
-  const res   = await fetch(`${API}/api/payment/create-order`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body:    JSON.stringify({ amount: product.price, product_id: product.id })
-  });
-  const { orderId, amount } = await res.json();
-
-  // Step 2: Open Razorpay popup
-  const user = JSON.parse(localStorage.getItem('ut_user'));
-  const options = {
-    key:      'rzp_test_Sk8AKDV1RehX6d',  // your Key ID
-    amount,
-    currency: 'INR',
-    name:     'UniTrade',
-    description: product.title,
-    order_id: orderId,
-    handler: async function(response) {
-      // Step 3: Verify on server
-      const verify = await fetch(`${API}/api/payment/verify`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body:    JSON.stringify({
-          razorpay_order_id:   response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature:  response.razorpay_signature,
-          product_id:          product.id,
-          amount:              product.price
-        })
-      });
-      const data = await verify.json();
-      if (data.message === 'Payment successful!') {
-        showToast('Payment done! Listing marked as sold.');
-        setTimeout(() => navigate('../home/index.html'), 1500);
-      }
-    },
-    prefill: { name: user.name, email: user.email },
-    theme:   { color: '#4F46E5' }  // UniTrade indigo colour
-  };
-
-  const rzp = new window.Razorpay(options);
-  rzp.open();
-}
-
 /* ─────────────────────────────────────
    SHARE HELPERS
 ───────────────────────────────────── */
@@ -417,6 +366,67 @@ window.shareWhatsApp = function() {
 /* ─────────────────────────────────────
    INIT
 ───────────────────────────────────── */
+/* ─────────────────────────────────────
+   RAZORPAY PAYMENT
+───────────────────────────────────── */
+async function initiatePayment(product) {
+  const token = localStorage.getItem('ut_token');
+  if (!token) { showToast('Please log in to make a payment.'); return; }
+
+  try {
+    // Step 1 — Create order on server
+    const res  = await fetch(`${API}/api/payment/create-order`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body:    JSON.stringify({ amount: product.price, product_id: product.id })
+    });
+    const { orderId, amount } = await res.json();
+
+    // Step 2 — Open Razorpay popup
+    const user = JSON.parse(localStorage.getItem('ut_user') || '{}');
+    const options = {
+      key:         'rzp_test_Sk8AKDV1RehX6d',
+      amount,
+      currency:    'INR',
+      name:        'UniTrade',
+      description: product.title,
+      image:       'https://unitrade-project-1.onrender.com/favicon.ico',
+      order_id:    orderId,
+      handler: async function(response) {
+        // Step 3 — Verify on server
+        const verify = await fetch(`${API}/api/payment/verify`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body:    JSON.stringify({
+            razorpay_order_id:   response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature:  response.razorpay_signature,
+            product_id:          product.id,
+            amount:              product.price
+          })
+        });
+        const data = await verify.json();
+        if (data.message === 'Payment successful!') {
+          showToast('✅ Payment successful! Redirecting…');
+          setTimeout(() => { window.location.href = '../home/index.html'; }, 1800);
+        } else {
+          showToast('Payment verification failed. Contact support.');
+        }
+      },
+      prefill: { name: user.name || '', email: user.email || '' },
+      theme:   { color: '#4F46E5' }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', () => showToast('Payment failed. Please try again.'));
+    rzp.open();
+
+  } catch (err) {
+    showToast('Could not initiate payment. Try again.');
+    console.error('Payment error:', err);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Auth guard ──────────────────────────────────────────────
@@ -431,17 +441,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('navUname').textContent = user.name || 'User';
 
   // ── Get product ID from URL ──────────────────────────────────
-const id = Number(getParam('id'));
-
-if (!id) {
-  const skeleton = document.getElementById('skeletonWrap');
-  if (skeleton) skeleton.style.display = 'none';
-
-  const notFound = document.getElementById('notFound');
-  if (notFound) notFound.style.display = 'block';
-
-  return;
-}
+  const id = Number(getParam('id'));
+  if (!id) {
+    document.getElementById('skeletonWrap').style.display = 'none';
+    document.getElementById('notFound').style.display     = 'block';
+    return;
+  }
 
   // ── Load product from real API ───────────────────────────────
   const product = await loadProduct(id);
