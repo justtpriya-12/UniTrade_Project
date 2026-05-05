@@ -15,6 +15,10 @@ const {
   notifySellerProductListed,
   notifyAllUsersNewProduct
 } = require('../services/notify');
+const {
+  emailListingPublished,
+  emailNewProductBroadcast
+} = require('../services/emailService');
 
 // ── GET ALL PRODUCTS ─────────────────────────────────────────
 async function getAllProducts(req, res) {
@@ -186,24 +190,41 @@ async function createProduct(req, res) {
         );
         const catName = cat ? cat.name : 'General';
 
-        // 3. Notify seller — "Your listing is live!"
-        if (seller && seller.phone) {
-          await notifySellerProductListed({
-            sellerName:   seller.name,
-            phone:        seller.phone,
-            productTitle: title.trim(),
-            price:        Number(price),
-            productId
-          });
+        // 3. Notify seller — WhatsApp + Email "Your listing is live!"
+        if (seller) {
+          // WhatsApp
+          if (seller.phone) {
+            await notifySellerProductListed({
+              sellerName:   seller.name,
+              phone:        seller.phone,
+              productTitle: title.trim(),
+              price:        Number(price),
+              productId
+            });
+          }
+          // Email — get seller email
+          const [[sellerFull]] = await db.query(
+            'SELECT email FROM users WHERE id = ?', [req.user.id]
+          );
+          if (sellerFull && sellerFull.email) {
+            await emailListingPublished({
+              sellerName:   seller.name,
+              email:        sellerFull.email,
+              productTitle: title.trim(),
+              price:        Number(price),
+              productId
+            });
+          }
         }
 
-        // 4. Broadcast to ALL other users who have phone numbers
+        // 4. Broadcast to ALL other users — WhatsApp + Email
         const [allUsers] = await db.query(
-          'SELECT phone FROM users WHERE phone IS NOT NULL AND phone != "" AND id != ?',
+          'SELECT phone, email, name FROM users WHERE id != ?',
           [req.user.id]
         );
-        const allPhones = allUsers.map(u => u.phone).filter(Boolean);
 
+        // WhatsApp broadcast (only users with phone)
+        const allPhones = allUsers.map(u => u.phone).filter(Boolean);
         if (allPhones.length > 0) {
           await notifyAllUsersNewProduct({
             sellerName:   seller ? seller.name : 'A student',
@@ -213,6 +234,21 @@ async function createProduct(req, res) {
             productId,
             allPhones
           });
+        }
+
+        // Email broadcast (all users with email)
+        for (const u of allUsers) {
+          if (u.email) {
+            emailNewProductBroadcast({
+              email:        u.email,
+              recipientName: u.name || 'Student',
+              sellerName:   seller ? seller.name : 'A student',
+              productTitle: title.trim(),
+              price:        Number(price),
+              category:     catName,
+              productId
+            }).catch(e => console.error('Broadcast email error:', e));
+          }
         }
 
       } catch (err) {

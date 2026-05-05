@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt    = require('jsonwebtoken');
 const db     = require('../config/db');
 const { notifyRegistration } = require('../services/notify');
+const { emailWelcome }        = require('../services/emailService');
 
 // ── REGISTER ────────────────────────────────────────────────
 async function register(req, res) {
@@ -57,12 +58,15 @@ async function register(req, res) {
       }
     });
 
-    // 8. Fire WhatsApp + SMS welcome notification in background
+    // 8. Fire WhatsApp + SMS + Email welcome notifications in background
     // Does NOT block the response — fires after res.json()
     if (phone) {
       notifyRegistration({ name: name.trim(), phone })
         .catch(err => console.error('Notify registration error:', err));
     }
+    // Send welcome email regardless of phone
+    emailWelcome({ name: name.trim(), email: email.toLowerCase().trim() })
+      .catch(err => console.error('Welcome email error:', err));
 
   } catch (err) {
     console.error('Register error:', err);

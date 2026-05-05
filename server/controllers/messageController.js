@@ -2,6 +2,7 @@
 
 const db = require('../config/db');
 const { notifySellerNewMessage } = require('../services/notify');
+const { emailNewMessage }       = require('../services/emailService');
 
 // ── GET MY CONVERSATIONS ─────────────────────────────────────
 async function getConversations(req, res) {
@@ -109,13 +110,28 @@ async function sendMessage(req, res) {
           [product_id]
         );
 
-        // Only send if seller has a phone number
+        // WhatsApp — only if seller has phone
         if (seller && seller.phone) {
           await notifySellerNewMessage({
             phone:        seller.phone,
             sellerName:   seller.name,
-            buyerName:    buyer  ? buyer.name    : 'A student',
+            buyerName:    buyer   ? buyer.name    : 'A student',
             productTitle: product ? product.title : 'your listing',
+            productId:    product_id
+          });
+        }
+
+        // Email — get seller email and send
+        const [[sellerWithEmail]] = await db.query(
+          'SELECT email FROM users WHERE id = ?', [receiver_id]
+        );
+        if (sellerWithEmail && sellerWithEmail.email) {
+          await emailNewMessage({
+            sellerEmail:  sellerWithEmail.email,
+            sellerName:   seller  ? seller.name   : 'Seller',
+            buyerName:    buyer   ? buyer.name     : 'A student',
+            productTitle: product ? product.title  : 'your listing',
+            messageBody:  body.trim(),
             productId:    product_id
           });
         }

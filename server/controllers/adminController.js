@@ -1,6 +1,7 @@
 // server/controllers/adminController.js
 
 const db = require('../config/db');
+const { emailAccountBlocked, emailReportResolved } = require('../services/emailService');
 
 // ── GET ALL USERS ────────────────────────────────────────────
 async function getAllUsers(req, res) {
@@ -25,6 +26,17 @@ async function toggleBlockUser(req, res) {
     await db.query('UPDATE users SET is_blocked = ? WHERE id = ?', [newStatus, id]);
 
     res.json({ message: newStatus ? 'User blocked.' : 'User unblocked.', is_blocked: newStatus });
+
+    // Send email if blocking (not unblocking)
+    if (newStatus === 1) {
+      const [[blockedUser]] = await db.query(
+        'SELECT name, email FROM users WHERE id = ?', [id]
+      );
+      if (blockedUser && blockedUser.email) {
+        emailAccountBlocked({ email: blockedUser.email, name: blockedUser.name })
+          .catch(e => console.error('Block email error:', e));
+      }
+    }
   } catch (err) {
     res.status(500).json({ message: 'Server error.' });
   }

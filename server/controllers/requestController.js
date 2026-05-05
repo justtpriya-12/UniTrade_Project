@@ -2,6 +2,7 @@
 
 const db = require('../config/db');
 const { notifyRequestMatch } = require('../services/notify');
+const { emailRequestMatch }   = require('../services/emailService');
 
 /* ─────────────────────────────────────────────────────────────
    HELPER — create a notification for a user
@@ -226,6 +227,22 @@ async function checkAndNotifyRequests(product) {
           price:         product.price,
           productId:     product.id
         }).catch(e => console.error('Request match WhatsApp error:', e));
+      }
+
+      // 3. Send email notification — get requester email
+      const [[requesterWithEmail]] = await db.query(
+        'SELECT email FROM users WHERE id = ?', [request.user_id]
+      );
+      if (requesterWithEmail && requesterWithEmail.email) {
+        emailRequestMatch({
+          email:         requesterWithEmail.email,
+          requesterName: request.user_name || 'Student',
+          requestTitle:  request.title,
+          productTitle:  product.title,
+          sellerName,
+          price:         product.price,
+          productId:     product.id
+        }).catch(e => console.error('Request match email error:', e));
       }
     }
   } catch (err) {
