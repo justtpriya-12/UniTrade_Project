@@ -128,8 +128,8 @@
 
         <!-- Owner actions -->
         <div class="owner-actions" id="ownerActions" style="display:none">
-          <button class="btn-edit"   id="editBtn">✏️ Edit Listing</button>
-          <button class="btn-delete" id="deleteBtn">🗑️ Delete</button>
+          <button class="btn-edit"      id="editBtn">✏️ Edit Listing</button>
+          <button class="btn-delete"    id="deleteBtn">🗑️ Delete</button>
           <button class="btn-mark-sold" id="markSoldBtn">✅ Mark as Sold</button>
         </div>
 
@@ -138,7 +138,7 @@
         <!-- ── BUYER ACTION BUTTONS ── -->
         <div class="cta-actions" id="buyerActions">
 
-          <!-- Contact Seller — indigo -->
+          <!-- Contact Seller — indigo gradient -->
           <button class="btn-contact-seller" id="contactBtn">
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15" style="flex-shrink:0">
               <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
@@ -147,7 +147,7 @@
             Contact Seller
           </button>
 
-          <!-- Pay Now — green -->
+          <!-- Pay Now — green gradient, price injected by script.js via #payAmountLabel -->
           <button class="btn-pay-now" id="payBtn">
             <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15" style="flex-shrink:0">
               <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
@@ -156,8 +156,11 @@
             Pay <span id="payAmountLabel">₹0</span>
           </button>
 
-          <!-- Save / Wishlist -->
+          <!-- Save / Wishlist — .saved class added by updateWishlistUI() for green bg -->
           <button class="btn-wishlist" id="wishlistLg">🤍 Save</button>
+
+          <!-- wishlistFab: referenced by script.js with optional chaining — hidden, no visual -->
+          <button id="wishlistFab" style="display:none" aria-hidden="true"></button>
 
         </div>
 
@@ -168,6 +171,7 @@
               <span style="font-size:16px">💬</span>
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--p)">Send a Message</div>
+                <!-- script.js sets seller name here -->
                 <div style="font-size:11px;color:var(--txt3)" id="mbSellerName">to Seller</div>
               </div>
             </div>
@@ -230,6 +234,39 @@
 
   <div class="toast"     id="toast"></div>
   <div class="page-fade" id="pageFade"></div>
+
   <script src="./script.js"></script>
+
+  <!-- Small inline patch: quick chips + wishlist green state -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // 1. Quick chips → paste text into textarea
+      document.querySelectorAll('.msg-quick').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const ta = document.getElementById('mbText');
+          if (ta) { ta.value = chip.dataset.msg || chip.textContent.trim(); ta.focus(); }
+        });
+      });
+
+      // 2. wishlistFab (hidden) mirrors to wishlistLg so script.js listener works
+      document.getElementById('wishlistFab')?.addEventListener('click', () => {
+        document.getElementById('wishlistLg')?.click();
+      });
+
+      // 3. Patch updateWishlistUI to also apply .saved green class on wishlistLg
+      const _origUpdateWishlistUI = window.updateWishlistUI;
+      if (typeof _origUpdateWishlistUI === 'function') {
+        window.updateWishlistUI = function(id) {
+          _origUpdateWishlistUI(id);
+          const saved  = JSON.parse(localStorage.getItem('ut_wishlist') || '[]').includes(id);
+          const lgBtn  = document.getElementById('wishlistLg');
+          if (lgBtn) lgBtn.classList.toggle('saved', saved);
+        };
+      }
+
+    });
+  </script>
+
 </body>
 </html>
