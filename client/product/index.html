@@ -7,266 +7,247 @@
   <link rel="stylesheet" href="./style.css"/>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
-<body class="product-page">
+<body>
 
   <!-- ══ NAVBAR ══ -->
   <nav class="navbar">
     <div class="nav-inner">
-
       <a class="nav-brand" href="../home/index.html">
         <div class="nav-logo">UT</div>
         <span class="nav-name">UniTrade</span>
       </a>
 
-      <!-- CSS: .nav-breadcrumb (not .breadcrumb) -->
-      <div class="nav-breadcrumb">
+      <div class="breadcrumb">
         <a href="../home/index.html">Browse</a>
         <span>›</span>
         <span id="bcCategory">Category</span>
         <span>›</span>
-        <span id="bcCurrent">Product</span>
+        <!-- FIX 1: was bcTitle → script.js uses bcCurrent -->
+        <span id="bcCurrent" class="bc-current">Product</span>
       </div>
 
-      <!-- CSS: .nav-actions (not .nav-right) -->
-      <div class="nav-actions">
-        <!-- CSS: .btn-sell (not .btn-sell-sm) -->
-        <a href="../sell/index.html" class="btn-sell">+ Sell</a>
+      <div class="nav-right">
+        <a href="../sell/index.html" class="btn-sell-sm">+ Sell</a>
         <div class="nav-user" id="navUser">
           <div class="nav-av" id="navAv">U</div>
           <span class="nav-uname" id="navUname">User</span>
           <div class="nav-menu" id="navMenu">
             <a href="../dashboard/index.html" class="nmenu-item">📊 My Dashboard</a>
             <a href="../sell/index.html"       class="nmenu-item">📦 Sell an Item</a>
-            <!-- CSS: .nmenu-div (not .nmenu-divider) -->
-            <div class="nmenu-div"></div>
-            <!-- CSS: .nmenu-item.logout (not .logout-btn) -->
-            <button class="nmenu-item logout" id="logoutBtn">⏻ Logout</button>
+            <div class="nmenu-divider"></div>
+            <button class="nmenu-item logout-btn" id="logoutBtn">⏻ Logout</button>
           </div>
         </div>
       </div>
-
     </div>
   </nav>
 
-  <!-- ══ SKELETON ══ -->
-  <div id="skeletonWrap" class="skeleton-page">
-    <div class="container">
-      <div class="sk sk-gallery"></div>
-      <div class="sk-info-col">
-        <div class="sk sk-line w50"></div>
-        <div class="sk sk-line w80"></div>
-        <div class="sk sk-line w50"></div>
-        <div class="sk sk-line w100"></div>
-        <div class="sk sk-line w90"></div>
-        <div class="sk sk-line w70"></div>
+  <!-- FIX 2: skeletonWrap was missing — script.js calls skeletonWrap.style.display = 'none' -->
+  <div id="skeletonWrap" style="padding: 2rem; text-align: center; color: #888;">
+    Loading product…
+  </div>
+
+  <!-- FIX 3: notFound was missing — script.js shows this when product not found -->
+  <div id="notFound" style="display:none; padding: 3rem; text-align: center;">
+    <div style="font-size: 3rem;">😕</div>
+    <h2>Product not found</h2>
+    <p>This listing may have been removed or the link is incorrect.</p>
+    <a href="../home/index.html" style="color:#4F46E5">← Back to listings</a>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <div class="page-wrap">
+
+    <!-- Back -->
+    <button class="back-btn" onclick="history.back()">← Back to listings</button>
+
+    <!-- Product layout (hidden until JS renders it) -->
+    <div class="product-layout" id="productLayout" style="display:none">
+
+      <!-- LEFT: Image gallery -->
+      <div class="gallery-col">
+        <div class="main-img-wrap" id="mainImgWrap">
+          <div class="main-img" id="mainImg">
+            <!-- filled by JS -->
+          </div>
+          <button class="img-nav prev" id="imgPrev">‹</button>
+          <button class="img-nav next" id="imgNext">›</button>
+          <div class="img-counter" id="imgCounter">1 / 1</div>
+        </div>
+        <div class="thumb-strip" id="thumbStrip">
+          <!-- FIX 4: was thumbStrip but buildGallery() writes to thumbRow — rename to thumbRow -->
+        </div>
+        <div class="thumb-strip" id="thumbRow"></div>
+
+        <!-- Safety tips card -->
+        <div class="safety-card">
+          <div class="safety-title">🛡️ Safety Tips</div>
+          <ul class="safety-list">
+            <li>Meet in a public campus location</li>
+            <li>Inspect the item before paying</li>
+            <li>Never pay in advance online</li>
+            <li>Bring a friend if unsure</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RIGHT: Product info -->
+      <div class="info-col">
+
+        <!-- Category + badges -->
+        <div class="info-top-row">
+          <span class="info-cat" id="infoCat">Category</span>
+          <div class="top-badges">
+            <!-- FIX 5: was condBadge → script.js uses conditionBadge -->
+            <span class="cond-badge" id="conditionBadge">Condition</span>
+            <span class="fresh-badge" id="freshBadge">Just listed</span>
+          </div>
+        </div>
+
+        <h1 class="info-title" id="infoTitle">Loading…</h1>
+
+        <!-- Price row -->
+        <div class="price-row">
+          <!-- FIX 6: was priceMain → script.js uses infoPrice -->
+          <div class="price-main" id="infoPrice">₹0</div>
+          <!-- FIX 7: was priceOrig → script.js uses origPrice (and priceOg for location) -->
+          <div class="price-orig" id="origPrice"></div>
+          <div class="price-orig" id="priceOg"></div>
+          <div class="discount-badge" id="discountBadge"></div>
+        </div>
+
+        <!-- FIX 8: was quickStats → script.js uses metaChips -->
+        <div class="quick-stats" id="metaChips">
+          <!-- filled by JS -->
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Description -->
+        <div class="section-label">Description</div>
+        <!-- FIX 9: was descText → script.js uses infoDesc -->
+        <div class="desc-text" id="infoDesc">Loading…</div>
+
+        <!-- Tags -->
+        <div class="tags-row" id="tagsRow"></div>
+
+        <div class="divider"></div>
+
+        <!-- Seller card -->
+        <div class="section-label">Seller</div>
+        <div class="seller-card" id="sellerCard">
+          <div class="seller-av" id="sellerAv">S</div>
+          <div class="seller-info">
+            <div class="seller-name" id="sellerName">Seller</div>
+            <div class="seller-meta" id="sellerMeta">Verified student</div>
+            <!-- FIX 10: sellerStats was missing entirely — script.js writes seller ID here -->
+            <div class="seller-stats" id="sellerStats"></div>
+            <div class="seller-rating" id="sellerRating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-val">4.8</span>
+              <span class="rating-count">(12 reviews)</span>
+            </div>
+          </div>
+          <button class="btn-view-profile" id="viewProfileBtn">View Profile</button>
+        </div>
+
+        <!-- Owner actions (shown only to the listing owner) -->
+        <div class="owner-actions" id="ownerActions" style="display:none">
+          <button class="btn-edit"      id="editBtn">✏️ Edit Listing</button>
+          <button class="btn-delete"    id="deleteBtn">🗑️ Delete</button>
+          <button class="btn-mark-sold" id="markSoldBtn">✅ Mark as Sold</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- FIX 11: was ctaActions → script.js uses buyerActions -->
+        <div class="cta-actions" id="buyerActions">
+          <button class="btn-contact-seller" id="contactBtn">
+            💬 Contact Seller
+          </button>
+
+          <!-- FIX 12: payAmount span is here but JS never updates it separately.
+               The pay button needs to read price from infoPrice after render. 
+               We keep the span and update it via a small inline fix below. -->
+          <button class="btn-pay" id="payBtn">
+            Pay ₹<span id="payAmount">0</span>
+          </button>
+
+          <!-- FIX 13: was wishlistBtn → script.js uses wishlistLg -->
+          <button class="btn-wishlist" id="wishlistLg">
+            🤍 Save
+          </button>
+        </div>
+
+        <!-- FIX 14: contact panel IDs corrected throughout -->
+        <!-- was contactPanel → messageBox, cpClose → cancelMsgBtn, msgInput → mbText, sendBtn → sendMsgBtn -->
+        <div class="contact-panel" id="messageBox" style="display:none">
+          <div class="contact-panel-head">
+            <span>Send a Message</span>
+            <button class="cp-close" id="cancelMsgBtn">✕</button>
+          </div>
+          <div class="msg-history" id="msgHistory">
+            <div class="msg-hint">Start the conversation — ask about availability, condition, or negotiate the price!</div>
+          </div>
+          <div class="msg-quick-row">
+            <button class="msg-quick" data-msg="Is this still available?">Still available?</button>
+            <button class="msg-quick" data-msg="Can you do a lower price?">Negotiate price?</button>
+            <button class="msg-quick" data-msg="Where can we meet on campus?">Meet location?</button>
+          </div>
+          <div class="msg-input-row">
+            <textarea id="mbText" rows="2" placeholder="Type your message…" maxlength="300"></textarea>
+            <button class="btn-send" id="sendMsgBtn">Send ↑</button>
+          </div>
+        </div>
+
       </div>
     </div>
-  </div>
 
-  <!-- ══ NOT FOUND ══ -->
-  <div id="notFound" style="display:none" class="not-found">
-    <div class="nf-emoji">😕</div>
-    <div class="nf-title">Product not found</div>
-    <div class="nf-sub">This listing may have been removed or the link is incorrect.</div>
-    <a href="../home/index.html" class="btn-back-home">← Back to listings</a>
-  </div>
-
-  <!-- ══ PRODUCT LAYOUT ══ -->
-  <!-- CSS: .container (not .product-layout) -->
-  <div class="container" id="productLayout" style="display:none">
-
-    <!-- LEFT: Gallery -->
-    <div class="gallery-col">
-
-      <!-- CSS: .main-img (no wrapper needed) -->
-      <div class="main-img" id="mainImg">
+    <!-- ══ RELATED PRODUCTS ══ -->
+    <section class="related-section">
+      <h2 class="related-title">More in <span id="relatedCatLabel">this category</span></h2>
+      <!-- FIX 15: was relatedGrid → script.js uses similarGrid -->
+      <div class="related-grid" id="similarGrid">
         <!-- filled by JS -->
       </div>
+    </section>
 
-      <!-- CSS: .thumb-strip, JS targets #thumbRow -->
-      <div class="thumb-strip" id="thumbRow"></div>
+  </div><!-- /page-wrap -->
 
-      <div class="img-hint">Tap thumbnail to switch image</div>
-
-      <!-- Condition / status tags under image -->
-      <div class="gallery-tags" id="galleryTags"></div>
-
-    </div>
-
-    <!-- RIGHT: Info -->
-    <div class="info-col">
-
-      <!-- CSS: .info-category (not .info-cat) -->
-      <div class="info-category" id="infoCat">Category</div>
-
-      <h1 class="info-title" id="infoTitle">Loading…</h1>
-
-      <!-- CSS: .price-block (not .price-row) -->
-      <div class="price-block">
-        <!-- CSS: .info-price (not .price-main) -->
-        <div class="info-price" id="infoPrice">₹0</div>
-        <div id="origPrice"></div>
-        <div id="priceOg" style="font-size:12px;color:var(--txt3)"></div>
-      </div>
-
-      <!-- CSS: .meta-pills + .mpill chips (not .quick-stats) -->
-      <div class="meta-pills" id="metaChips">
-        <!-- JS fills: date, category, condition, views chips -->
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- CSS: .section-lbl (not .section-label) -->
-      <div class="section-lbl">Description</div>
-      <!-- CSS: .info-desc (not .desc-text) -->
-      <div class="info-desc" id="infoDesc">Loading…</div>
-
-      <div class="divider"></div>
-
-      <div class="section-lbl">Seller</div>
-
-      <!-- Seller card: CSS uses .sc-left, .sc-av, .sc-name, .sc-meta, .sc-stats -->
-      <div class="seller-card" id="sellerCard">
-        <div class="sc-left">
-          <div class="sc-av" id="sellerAv">S</div>
-          <div>
-            <div class="sc-name"  id="sellerName">Seller</div>
-            <div class="sc-meta"  id="sellerMeta">Verified campus student</div>
-          </div>
-        </div>
-        <div class="sc-stats" id="sellerStats">
-          <!-- JS fills seller ID -->
-        </div>
-      </div>
-
-      <!-- Owner panel: CSS uses .own-panel, .own-tag, .own-actions -->
-      <div class="own-panel" id="ownerActions" style="display:none">
-        <div class="own-tag">📦 You listed this item</div>
-        <div class="own-actions">
-          <button class="btn-edit"   id="editBtn">✏️ Edit</button>
-          <button class="btn-delete" id="deleteBtn">🗑️ Delete</button>
-        </div>
-      </div>
-
-      <!-- Buyer actions: CSS uses .buyer-actions (not .cta-actions) -->
-      <div class="buyer-actions" id="buyerActions">
-
-        <!-- CSS: .btn-contact (not .btn-contact-seller) -->
-        <button class="btn-contact" id="contactBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          Contact Seller
-        </button>
-
-        <!-- CSS: .btn-pay-now (not .btn-pay) -->
-        <button class="btn-pay-now" id="payBtn">
-          💳 Pay ₹<span id="payAmount">0</span>
-        </button>
-
-        <!-- CSS: .btn-wishlist (same) -->
-        <button class="btn-wishlist" id="wishlistLg" title="Save to wishlist">🤍</button>
-
-        <!-- CSS: .btn-share -->
-        <button class="btn-share" onclick="copyLink()" title="Copy link">🔗</button>
-
-      </div>
-
-      <!-- Safety box -->
-      <div class="safety-box">
-        <div class="safety-icon">🛡️</div>
-        <div>
-          <strong>Stay Safe on Campus</strong>
-          <div class="safety-text">
-            Meet in a public campus location · Inspect before paying ·
-            Never pay online in advance · Bring a friend if unsure
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div><!-- /container -->
-
-  <!-- ══ RELATED PRODUCTS ══ -->
-  <div class="related-section">
-    <div class="related-inner">
-      <h2 class="section-lbl" style="font-size:14px;margin-bottom:1rem;color:var(--txt)">
-        More in
-        <span id="relatedCatLabel"
-              style="color:var(--p);text-transform:none;font-size:14px;letter-spacing:0;font-weight:900">
-          this category
-        </span>
-      </h2>
-      <div class="related-grid" id="similarGrid"></div>
-    </div>
-  </div>
-
-  <!-- ══ CONTACT MODAL ══ -->
-  <!-- CSS: .overlay (not .modal-overlay) -->
-  <div class="overlay" id="contactModal">
+  <!-- ── Delete confirm modal ── -->
+  <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
-
-      <button class="modal-close" id="closeModalBtn">✕</button>
-
-      <div class="modal-head">
-        <div class="mh-av" id="modalSellerAv">S</div>
-        <div>
-          <div class="mh-title" id="modalSellerName">Seller</div>
-          <div class="mh-sub">Send a message about this listing</div>
-        </div>
-        <span class="mh-badge">🔒 Secure</span>
-      </div>
-
-      <!-- Quick chips -->
-      <div class="quick-chips">
-        <button class="qchip" data-msg="Is this still available?">🙋 Still available?</button>
-        <button class="qchip" data-msg="Can you share more photos?">📸 More photos?</button>
-        <button class="qchip" data-msg="Can you lower the price a bit?">💰 Negotiate?</button>
-        <button class="qchip" data-msg="Where can we meet on campus?">📍 Meet location?</button>
-      </div>
-
-      <!-- CSS: .msg-textarea -->
-      <textarea class="msg-textarea" id="mbText" rows="4"
-        placeholder="Write your message… e.g. 'Is this still available?'"
-        maxlength="400"></textarea>
-
-      <!-- CSS: .btn-send-msg -->
-      <button class="btn-send-msg" id="sendMsgBtn">Send Message ↑</button>
-
-    </div>
-  </div>
-
-  <!-- ══ DELETE CONFIRM MODAL ══ -->
-  <div class="overlay" id="deleteModal">
-    <div class="modal-box" style="max-width:380px;text-align:center;">
-      <div style="font-size:3rem;margin-bottom:10px;">🗑️</div>
-      <div class="mh-title" style="margin-bottom:8px;">Delete this listing?</div>
-      <div class="mh-sub"   style="margin-bottom:1.5rem;">
-        This cannot be undone. Your listing will be permanently removed.
-      </div>
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button id="deleteCancelBtn"
-                style="padding:10px 22px;background:var(--surface);border:1px solid var(--bdr);
-                       border-radius:var(--rs);font-family:var(--fd);font-size:13px;
-                       font-weight:700;color:var(--txt2);cursor:pointer;">
-          Cancel
-        </button>
-        <button id="deleteConfirmBtn"
-                style="padding:10px 22px;background:var(--red);border:none;
-                       border-radius:var(--rs);font-family:var(--fd);font-size:13px;
-                       font-weight:700;color:#fff;cursor:pointer;">
-          Yes, Delete
-        </button>
+      <div class="modal-icon">🗑️</div>
+      <div class="modal-title">Delete this listing?</div>
+      <div class="modal-sub">This action cannot be undone. Your listing will be permanently removed.</div>
+      <div class="modal-btns">
+        <button class="btn-cancel"      id="deleteCancelBtn">Cancel</button>
+        <button class="btn-confirm-del" id="deleteConfirmBtn">Yes, Delete</button>
       </div>
     </div>
   </div>
 
-  <div class="toast"     id="toast"></div>
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
   <div class="page-fade" id="pageFade"></div>
 
   <script src="./script.js"></script>
 
+  <!-- FIX 16: Update payAmount span after script renders the price -->
+  <script>
+    // After DOM is ready, sync the Pay button amount with the rendered price
+    document.addEventListener('DOMContentLoaded', () => {
+      // Observer watches infoPrice for changes and mirrors value to payAmount
+      const priceEl  = document.getElementById('infoPrice');
+      const payAmtEl = document.getElementById('payAmount');
+      if (priceEl && payAmtEl) {
+        const obs = new MutationObserver(() => {
+          // infoPrice text is like "₹1,450" — strip the ₹ sign
+          payAmtEl.textContent = priceEl.textContent.replace('₹', '').trim();
+        });
+        obs.observe(priceEl, { childList: true, subtree: true, characterData: true });
+      }
+    });
+  </script>
 </body>
 </html>
