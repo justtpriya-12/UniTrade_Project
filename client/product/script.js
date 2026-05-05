@@ -367,7 +367,7 @@ async function initiatePayment(product) {
   // Step 2: Open Razorpay popup
   const user = JSON.parse(localStorage.getItem('ut_user'));
   const options = {
-    key:      'rzp_test_xxxxxxxxxxxxxxx',  // your Key ID
+    key:      'rzp_test_Sk8AKDV1RehX6d',  // your Key ID
     amount,
     currency: 'INR',
     name:     'UniTrade',

@@ -22,7 +22,8 @@
         <span>›</span>
         <span id="bcCategory">Category</span>
         <span>›</span>
-        <span id="bcTitle" class="bc-current">Product</span>
+        <!-- FIX 1: was bcTitle → script.js uses bcCurrent -->
+        <span id="bcCurrent" class="bc-current">Product</span>
       </div>
 
       <div class="nav-right">
@@ -41,14 +42,27 @@
     </div>
   </nav>
 
+  <!-- FIX 2: skeletonWrap was missing — script.js calls skeletonWrap.style.display = 'none' -->
+  <div id="skeletonWrap" style="padding: 2rem; text-align: center; color: #888;">
+    Loading product…
+  </div>
+
+  <!-- FIX 3: notFound was missing — script.js shows this when product not found -->
+  <div id="notFound" style="display:none; padding: 3rem; text-align: center;">
+    <div style="font-size: 3rem;">😕</div>
+    <h2>Product not found</h2>
+    <p>This listing may have been removed or the link is incorrect.</p>
+    <a href="../home/index.html" style="color:#4F46E5">← Back to listings</a>
+  </div>
+
   <!-- ══ MAIN ══ -->
   <div class="page-wrap">
 
     <!-- Back -->
     <button class="back-btn" onclick="history.back()">← Back to listings</button>
 
-    <!-- Skeleton / content -->
-    <div class="product-layout" id="productLayout">
+    <!-- Product layout (hidden until JS renders it) -->
+    <div class="product-layout" id="productLayout" style="display:none">
 
       <!-- LEFT: Image gallery -->
       <div class="gallery-col">
@@ -61,8 +75,9 @@
           <div class="img-counter" id="imgCounter">1 / 1</div>
         </div>
         <div class="thumb-strip" id="thumbStrip">
-          <!-- filled by JS -->
+          <!-- FIX 4: was thumbStrip but buildGallery() writes to thumbRow — rename to thumbRow -->
         </div>
+        <div class="thumb-strip" id="thumbRow"></div>
 
         <!-- Safety tips card -->
         <div class="safety-card">
@@ -83,7 +98,8 @@
         <div class="info-top-row">
           <span class="info-cat" id="infoCat">Category</span>
           <div class="top-badges">
-            <span class="cond-badge" id="condBadge">Condition</span>
+            <!-- FIX 5: was condBadge → script.js uses conditionBadge -->
+            <span class="cond-badge" id="conditionBadge">Condition</span>
             <span class="fresh-badge" id="freshBadge">Just listed</span>
           </div>
         </div>
@@ -92,24 +108,25 @@
 
         <!-- Price row -->
         <div class="price-row">
-          <div class="price-main" id="priceMain">₹0</div>
-          <div class="price-orig" id="priceOrig"></div>
+          <!-- FIX 6: was priceMain → script.js uses infoPrice -->
+          <div class="price-main" id="infoPrice">₹0</div>
+          <!-- FIX 7: was priceOrig → script.js uses origPrice (and priceOg for location) -->
+          <div class="price-orig" id="origPrice"></div>
+          <div class="price-orig" id="priceOg"></div>
           <div class="discount-badge" id="discountBadge"></div>
         </div>
 
-        <!-- Quick stats -->
-        <div class="quick-stats" id="quickStats">
-          <div class="qstat"><span class="qstat-ico">👁️</span><span id="statViews">0 views</span></div>
-          <div class="qstat"><span class="qstat-ico">❤️</span><span id="statWish">0 wishlists</span></div>
-          <div class="qstat"><span class="qstat-ico">📅</span><span id="statPosted">Posted</span></div>
-          <div class="qstat"><span class="qstat-ico">📍</span><span id="statLocation">Campus</span></div>
+        <!-- FIX 8: was quickStats → script.js uses metaChips -->
+        <div class="quick-stats" id="metaChips">
+          <!-- filled by JS -->
         </div>
 
         <div class="divider"></div>
 
         <!-- Description -->
         <div class="section-label">Description</div>
-        <div class="desc-text" id="descText">Loading…</div>
+        <!-- FIX 9: was descText → script.js uses infoDesc -->
+        <div class="desc-text" id="infoDesc">Loading…</div>
 
         <!-- Tags -->
         <div class="tags-row" id="tagsRow"></div>
@@ -123,6 +140,8 @@
           <div class="seller-info">
             <div class="seller-name" id="sellerName">Seller</div>
             <div class="seller-meta" id="sellerMeta">Verified student</div>
+            <!-- FIX 10: sellerStats was missing entirely — script.js writes seller ID here -->
+            <div class="seller-stats" id="sellerStats"></div>
             <div class="seller-rating" id="sellerRating">
               <span class="stars">★★★★★</span>
               <span class="rating-val">4.8</span>
@@ -134,47 +153,50 @@
 
         <!-- Owner actions (shown only to the listing owner) -->
         <div class="owner-actions" id="ownerActions" style="display:none">
-          <button class="btn-edit" id="editBtn">✏️ Edit Listing</button>
-          <button class="btn-delete" id="deleteBtn">🗑️ Delete</button>
+          <button class="btn-edit"      id="editBtn">✏️ Edit Listing</button>
+          <button class="btn-delete"    id="deleteBtn">🗑️ Delete</button>
           <button class="btn-mark-sold" id="markSoldBtn">✅ Mark as Sold</button>
         </div>
 
         <div class="divider"></div>
 
-        <!-- CTA buttons (shown to buyers) -->
-        <div class="cta-actions" id="ctaActions">
+        <!-- FIX 11: was ctaActions → script.js uses buyerActions -->
+        <div class="cta-actions" id="buyerActions">
           <button class="btn-contact-seller" id="contactBtn">
             💬 Contact Seller
           </button>
 
-          <!-- ✅ ADDED PAY BUTTON -->
+          <!-- FIX 12: payAmount span is here but JS never updates it separately.
+               The pay button needs to read price from infoPrice after render. 
+               We keep the span and update it via a small inline fix below. -->
           <button class="btn-pay" id="payBtn">
             Pay ₹<span id="payAmount">0</span>
           </button>
 
-
-          <button class="btn-wishlist" id="wishlistBtn">
+          <!-- FIX 13: was wishlistBtn → script.js uses wishlistLg -->
+          <button class="btn-wishlist" id="wishlistLg">
             🤍 Save
           </button>
         </div>
 
-        <!-- Contact modal inline -->
-        <div class="contact-panel" id="contactPanel" style="display:none">
+        <!-- FIX 14: contact panel IDs corrected throughout -->
+        <!-- was contactPanel → messageBox, cpClose → cancelMsgBtn, msgInput → mbText, sendBtn → sendMsgBtn -->
+        <div class="contact-panel" id="messageBox" style="display:none">
           <div class="contact-panel-head">
             <span>Send a Message</span>
-            <button class="cp-close" id="cpClose">✕</button>
+            <button class="cp-close" id="cancelMsgBtn">✕</button>
           </div>
           <div class="msg-history" id="msgHistory">
             <div class="msg-hint">Start the conversation — ask about availability, condition, or negotiate the price!</div>
           </div>
           <div class="msg-quick-row">
             <button class="msg-quick" data-msg="Is this still available?">Still available?</button>
-            <button class="msg-quick" data-msg="Can you do ₹ lower price?">Negotiate price?</button>
+            <button class="msg-quick" data-msg="Can you do a lower price?">Negotiate price?</button>
             <button class="msg-quick" data-msg="Where can we meet on campus?">Meet location?</button>
           </div>
           <div class="msg-input-row">
-            <textarea id="msgInput" rows="2" placeholder="Type your message…" maxlength="300"></textarea>
-            <button class="btn-send" id="sendBtn">Send ↑</button>
+            <textarea id="mbText" rows="2" placeholder="Type your message…" maxlength="300"></textarea>
+            <button class="btn-send" id="sendMsgBtn">Send ↑</button>
           </div>
         </div>
 
@@ -184,7 +206,8 @@
     <!-- ══ RELATED PRODUCTS ══ -->
     <section class="related-section">
       <h2 class="related-title">More in <span id="relatedCatLabel">this category</span></h2>
-      <div class="related-grid" id="relatedGrid">
+      <!-- FIX 15: was relatedGrid → script.js uses similarGrid -->
+      <div class="related-grid" id="similarGrid">
         <!-- filled by JS -->
       </div>
     </section>
@@ -198,7 +221,7 @@
       <div class="modal-title">Delete this listing?</div>
       <div class="modal-sub">This action cannot be undone. Your listing will be permanently removed.</div>
       <div class="modal-btns">
-        <button class="btn-cancel" id="deleteCancelBtn">Cancel</button>
+        <button class="btn-cancel"      id="deleteCancelBtn">Cancel</button>
         <button class="btn-confirm-del" id="deleteConfirmBtn">Yes, Delete</button>
       </div>
     </div>
@@ -209,5 +232,22 @@
   <div class="page-fade" id="pageFade"></div>
 
   <script src="./script.js"></script>
+
+  <!-- FIX 16: Update payAmount span after script renders the price -->
+  <script>
+    // After DOM is ready, sync the Pay button amount with the rendered price
+    document.addEventListener('DOMContentLoaded', () => {
+      // Observer watches infoPrice for changes and mirrors value to payAmount
+      const priceEl  = document.getElementById('infoPrice');
+      const payAmtEl = document.getElementById('payAmount');
+      if (priceEl && payAmtEl) {
+        const obs = new MutationObserver(() => {
+          // infoPrice text is like "₹1,450" — strip the ₹ sign
+          payAmtEl.textContent = priceEl.textContent.replace('₹', '').trim();
+        });
+        obs.observe(priceEl, { childList: true, subtree: true, characterData: true });
+      }
+    });
+  </script>
 </body>
 </html>
